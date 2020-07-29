@@ -1,0 +1,6 @@
+# ignore sonar-scanner folder
+.sonarcache/
+.scannerwork/
+
+# ignore results of tools
+tmp*results.xml

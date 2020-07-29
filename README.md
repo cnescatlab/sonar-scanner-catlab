@@ -27,7 +27,7 @@ This image is based on the official SonarQube [sonar-scanner-cli docker image](h
     * For information on what to write in it, see the [official SonarQube documentation](https://docs.sonarqube.org/7.9/analysis/analysis-parameters/)
 1. Execute the sonar-scanner on the project by running this image from the root of the project
     ```sh
-    docker run \
+    $ docker run \
             --rm \
             --name lequalscanner \
             -u "$(id -u):$(id -g)" \
@@ -37,8 +37,8 @@ This image is based on the official SonarQube [sonar-scanner-cli docker image](h
     ```
     * If the SonarQube server is running in a container on the same computer, you will need to connect both containers (server and client) to the same bridge so that they can communicate. To do so:
     ```sh
-    docker network create -d bridge sonarbridge
-    docker network connect sonarbridge "name of your sonarqube container"
+    $ docker network create -d bridge sonarbridge
+    $ docker network connect sonarbridge "name of your sonarqube container"
     # add the following option to the command line when running the lequal/sonar-scanner
     --network sonarbridge
     ```
@@ -49,7 +49,7 @@ Not only does this image provide a sonar-scanner, but also a set of open source 
 
 ```sh
 # Example with shellcheck
-docker run \
+$ docker run \
         --rm \
         -u "$(id -u):$(id -g)" \
         -v "$(pwd):/usr/src" \
@@ -110,7 +110,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Cache local Maven repository
+      - name: Cache sonar-scanner data
         uses: actions/cache@v2
         with:
           path: .sonarcache
@@ -170,6 +170,71 @@ sonar-scanning:
 | Tool                                                  | Version              | 
 |-------------------------------------------------------|----------------------|
 | [ShellCheck](https://github.com/koalaman/shellcheck)  | 0.7.0                |
+
+## Developer's guide
+
+### How to build the image
+
+It is a normal docker image. Thus, it can be built with the following commands.
+
+```sh
+# from the root of the project
+$ docker build -t lequal/sonar-scanner .
+```
+
+To then run a container with this image see the [user guide](#user-guide).
+
+### How to run tests
+
+Before testing the image, it must be built (see above).
+
+To run all the tests, use the test script.
+
+```sh
+# from the root of the project
+$ ./tests/run_tests.bash
+```
+
+To run a specific test:
+1. Create a docker bridge
+  * ```sh
+    $ docker network create sonarbridge
+    ```
+1. Export the environment variables the test needs
+  * ```sh
+    $ export SONARQUBE_CONTAINER_NAME=lequalsonarqube
+    $ export SONARQUBE_ADMIN_PASSWORD=pass
+    ```
+1. Run a container of the SonarQube server
+  * ```sh
+    docker run --name "$SONARQUBE_CONTAINER_NAME" \
+            -d --rm \
+            --stop-timeout 1 \
+            -p 9000:9000 \
+            -e SONARQUBE_ADMIN_PASSWORD="$SONARQUBE_ADMIN_PASSWORD" \
+            --net sonarbridge \
+            lequal/sonarqube:latest
+    ```
+* Wait until it is configured
+  * The message `[INFO] CNES LEQUAL SonarQube: ready!` is logged.
+  * To see the logs of a container running in background
+    ```sh
+    $ docker container logs -f "$SONARQUBE_CONTAINER_NAME"
+    Ctrl-C # once the container is ready
+    ```
+* Run a test script with 
+  * ```sh
+    $ ./tests/shell1.bash
+    ```
+* Test the exit status of the script with `echo $?`
+  * zero => success
+  * non-zero => failure
+
+### How to write tests
+
+Tests are just scripts. To add a test, create a file under the `tests/` folder and make it executable. Then, edit the script. Success and failure are given by exit statuses. A zero exist status is a success. A non-zero exit status is a failure. Note that when using `./tests/run_tests.bash`, only messages on STDERR will by displayed.
+
+All scripted tests are listed in the [wiki](https://github.com/lequal/sonar-scanner/wiki#list-of-scripted-integration-tests).
 
 ## How to contribute
 
