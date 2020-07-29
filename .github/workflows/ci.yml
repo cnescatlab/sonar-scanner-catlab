@@ -37,8 +37,8 @@ jobs:
           name: image
           path: image.tar
   # Jobs that test the image and the embedded tools
-  test-shell:
-    name: Test Shell language
+  test:
+    name: Test the Docker image
     runs-on: ubuntu-latest
     needs: build
     steps:
@@ -55,7 +55,7 @@ jobs:
           path: .sonarcache
           key: sonar-scanner-cache
       # Run the tests
-      - name: Run ShellCheck
+      - name: Test docker image
         run: ./tests/run_tests.bash
   # Job that runs the Dockerfile linter
   lint-Dockerfile:
