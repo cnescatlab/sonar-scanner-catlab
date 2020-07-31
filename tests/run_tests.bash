@@ -78,6 +78,7 @@ then
     atexit()
     {
         docker container stop "$SONARQUBE_CONTAINER_NAME" > /dev/null
+        docker network rm "$SONARQUBE_NETWORK"
     }
     trap atexit EXIT
 fi

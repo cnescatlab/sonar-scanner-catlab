@@ -40,7 +40,7 @@ This image is based on the official SonarQube [sonar-scanner-cli docker image](h
     $ docker network create -d bridge sonarbridge
     $ docker network connect sonarbridge "name of your sonarqube container"
     # add the following option to the command line when running the lequal/sonar-scanner
-    --network sonarbridge
+    --net sonarbridge
     ```
 
 ### How to use embedded tools
@@ -188,7 +188,12 @@ To then run a container with this image see the [user guide](#user-guide).
 
 Before testing the image, it must be built (see above).
 
-To run all the tests, use the test script.
+To run the tests, the following tools are required:
+
+* `curl`
+* `jq`
+
+To run all the tests, use the test script like this:
 
 ```sh
 # from the root of the project
@@ -204,6 +209,9 @@ To run a specific test:
   * ```sh
     $ export SONARQUBE_CONTAINER_NAME=lequalsonarqube
     $ export SONARQUBE_ADMIN_PASSWORD=pass
+    $ export SONARQUBE_NETWORK=sonarbridge
+    $ export SONARQUBE_LOCAL_URL=http://localhost:9000
+    $ export SONARQUBE_URL=http://${SONARQUBE_CONTAINER_NAME}:9000
     ```
 1. Run a container of the SonarQube server
   * ```sh

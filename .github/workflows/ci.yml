@@ -10,8 +10,18 @@ name: CI
 
 # This workflow is triggered each time commits are pushed to GitHub
 # and also on each pull request (on the commit that would be created
-# after the merge)
-on: [push, pull_request]
+# after the merge) but is not triggered if only markdown files were edited.
+on:
+  push:
+    branches:
+      - '*'
+    paths-ignore:
+      - '*.md'
+  pull_request:
+    branches:
+      - '*'
+    paths-ignore:
+      - '*.md'
 
 # Variables to configure the workflow
 env:
@@ -54,9 +64,9 @@ jobs:
         with:
           path: .sonarcache
           key: sonar-scanner-cache
-      # Run the tests
+      # Run the tests with a develop version of the server
       - name: Test docker image
-        run: ./tests/run_tests.bash
+        run: SONARQUBE_TAG=develop ./tests/run_tests.bash
   # Job that runs the Dockerfile linter
   lint-Dockerfile:
     name: Run hadolint on the Dockerfile
