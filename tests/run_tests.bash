@@ -21,8 +21,12 @@
 #                             the lequal/sonarqube image.
 #   SONARQUBE_ADMIN_PASSWORD: the password of the admin account on the server.
 #   SONARQUBE_URL: URL of lequal/sonarqube container if already running
-#                  without trailing /. e.g. http://mycontainer:9000
+#                  without trailing / from the scanner container.
+#                  e.g. http://mycontainer:9000
 #                  Use it only if no container name was given.
+#   SONARQUBE_LOCAL_URL: URL of lequal/sonarqube container if already running
+#                        without trailing / from the host.
+#                        e.g. http://localhost:9000
 #   SONARQUBE_TAG: the tag of the lequal/sonarqube image to use.
 #                  e.g. latest
 #   SONARQUBE_NETWORK: the name of the docker bridge used.
@@ -42,10 +46,13 @@ then
     export SONARQUBE_ADMIN_PASSWORD="adminpassword"
 fi
 
-export SONARQUBE_LOCAL_URL="$SONARQUBE_URL"
 if [ -z "$SONARQUBE_URL" ]
 then
     export SONARQUBE_URL="http://$SONARQUBE_CONTAINER_NAME:9000"
+fi
+
+if [ -z "$SONARQUBE_LOCAL_URL" ]
+then
     export SONARQUBE_LOCAL_URL="http://localhost:9000"
 fi
 
@@ -68,7 +75,6 @@ then
     # Run the server
     docker run --name "$SONARQUBE_CONTAINER_NAME" \
             -d --rm \
-            --stop-timeout 1 \
             -p 9000:9000 \
             -e SONARQUBE_ADMIN_PASSWORD="$SONARQUBE_ADMIN_PASSWORD" \
             --net "$SONARQUBE_NETWORK" \
@@ -84,7 +90,7 @@ then
 fi
 
 # Wait the configuration of the image before running the tests
-while ! docker container logs "$SONARQUBE_CONTAINER_NAME" 2>&1 | grep -q '\[INFO\] CNES LEQUAL SonarQube: ready!'
+while ! docker container logs "$SONARQUBE_CONTAINER_NAME" 2>&1 | grep -q '\[INFO\] CNES SonarQube: ready!'
 do
     echo "Waiting for SonarQube to be UP."
     sleep 5
@@ -98,7 +104,7 @@ failed="0"
 nb_test="0"
 for script in tests/*
 do
-    if [ -f "$script" ] && [ -x "$script" ] && [ "$script" != "tests/run_tests.bash" ]
+    if [ -f "$script" ] && [ -x "$script" ] && [ "$script" != "tests/run_tests.bash" ] && [ "$script" != "tests/README.md" ]
     then
         # Launch each test (only print warnings and errors)
         echo -n "Launching test $script..."
