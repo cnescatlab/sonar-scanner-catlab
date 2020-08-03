@@ -70,11 +70,11 @@ jobs:
           echo "Retrieving the branch name..."
           if [ "${{ github.event_name }}" = "push" ]
             branch=${{ github.ref }}
+            branch=${branch#*/}
+            branch=${branch#*/}
           else # PR
             branch=${{ github.head_ref }}
           fi
-          branch=${branch#*/}
-          branch=${branch#*/}
           echo "Cloning the server repo on branch $branch..."
           if ! git clone https://github.com/lequal/sonarqube.git -b "$branch" tmpserver;
           then
