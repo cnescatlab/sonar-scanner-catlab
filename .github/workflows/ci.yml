@@ -68,7 +68,11 @@ jobs:
       - name: Test docker image
         run: |
           echo "Retrieving the branch name..."
-          branch=${{ github.ref }}
+          if [ "${{ github.event_name }}" = "push" ]
+            branch=${{ github.ref }}
+          else # PR
+            branch=${{ github.head_ref }}
+          fi
           branch=${branch#*/}
           branch=${branch#*/}
           echo "Cloning the server repo on branch $branch..."
