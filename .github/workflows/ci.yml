@@ -69,6 +69,7 @@ jobs:
         run: |
           echo "Retrieving the branch name..."
           if [ "${{ github.event_name }}" = "push" ]
+          then
             branch=${{ github.ref }}
             branch=${branch#*/}
             branch=${branch#*/}
