@@ -10,8 +10,18 @@ name: CI
 
 # This workflow is triggered each time commits are pushed to GitHub
 # and also on each pull request (on the commit that would be created
-# after the merge)
-on: [push, pull_request]
+# after the merge) but is not triggered if only markdown files were edited.
+on:
+  push:
+    branches:
+      - '*'
+    paths-ignore:
+      - '*.md'
+  pull_request:
+    branches:
+      - '*'
+    paths-ignore:
+      - '*.md'
 
 # Variables to configure the workflow
 env:
@@ -54,9 +64,28 @@ jobs:
         with:
           path: .sonarcache
           key: sonar-scanner-cache
-      # Run the tests
+      # Run the tests (with the appropriate server image)
       - name: Test docker image
-        run: ./tests/run_tests.bash
+        run: |
+          echo "Retrieving the branch name..."
+          if [ "${{ github.event_name }}" = "push" ]
+          then
+            branch=${{ github.ref }}
+            branch=${branch#*/}
+            branch=${branch#*/}
+          else # PR
+            branch=${{ github.head_ref }}
+          fi
+          echo "Cloning the server repo on branch $branch..."
+          if ! git clone https://github.com/lequal/sonarqube.git -b "$branch" tmpserver;
+          then
+            echo "No branch $branch found on the server repository, using develop"
+            git clone https://github.com/lequal/sonarqube.git -b develop tmpserver
+          fi
+          echo "Building the server image..."
+          docker build -t lequal/sonarqube:latest tmpserver/
+          echo "Testing the scanner image..."
+          ./tests/run_tests.bash
   # Job that runs the Dockerfile linter
   lint-Dockerfile:
     name: Run hadolint on the Dockerfile
