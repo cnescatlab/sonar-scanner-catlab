@@ -179,6 +179,8 @@ sonar-scanning:
 
 ## Developer's guide
 
+_Note about branch naming_: if a new feature needs modifications to be made both on the server image and this one, it is strongly advised to give the same name to the branches on both repositories because the CI workflow of this image will try to use the server image built from the same branch.
+
 ### How to build the image
 
 It is a normal docker image. Thus, it can be built with the following commands.

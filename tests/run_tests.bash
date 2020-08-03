@@ -12,11 +12,10 @@
 #   --no-server-run: if this option is specified, the script will not run
 #                    a lequal/sonarqube container or create a bridge network.
 #                    It will only launch the tests.
-#                    In this, case make sur to set environment variables
-#                    like SONARQUBE_URL, SONARQUBE_ADMIN_PASSWORD or
-#                    SONARQUBE_CONTAINER_NAME.
+#                    In this case, make sur to set necessary environment
+#                    variables.
 #
-# Environment:
+# Environment variables:
 #   SONARQUBE_CONTAINER_NAME: the name to give to the container running
 #                             the lequal/sonarqube image.
 #   SONARQUBE_ADMIN_PASSWORD: the password of the admin account on the server.

@@ -16,6 +16,10 @@ docker run --rm -u "$(id -u):$(id -g)" \
 if ! diff tests/shell/tmp-shellcheck-results.xml tests/shell/reference-shellcheck-results.xml;
 then
     >&2 echo "Failed: ShellCheck XML reports are different."
+    >&2 echo "=== Result ==="
+    >&2 cat tests/shell/tmp-shellcheck-results.xml
+    >&2 echo "=== Reference ==="
+    >&2 cat tests/shell/reference-shellcheck-results.xml
     exit 1
 fi
 

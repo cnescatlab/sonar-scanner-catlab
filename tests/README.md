@@ -10,6 +10,9 @@ The `tests/` folder contains both the tests scripts and some dummy projects to a
 1. shell2
   * file: shell2.bash
   * purpose: Check that the sonar-scanner can analyze a shell project and sends its results to the server.
+1. java
+  * file: java.bash
+  * purpose: Check that the java language is supported with plugins expected.
 
 ### How to run all the tests
 
@@ -65,6 +68,19 @@ $ ./tests/run_tests.bash
 * Test the exit status of the script with `echo $?`
   * zero => success
   * non-zero => failure
+
+## List of options and environment variables used by the tests
+
+Options:
+* `--no-server-run`: if this option is specified, the script will not run a `lequal/sonarqube` container or create a bridge network. It will only launch the tests. In this case, make sur to set necessary environment variables.
+
+Environment variables:
+* `SONARQUBE_CONTAINER_NAME`: the name to give to the container running the `lequal/sonarqube` image.
+* `SONARQUBE_ADMIN_PASSWORD`: the password of the admin account on the server.
+* `SONARQUBE_URL`: URL of `lequal/sonarqube` container if already running without trailing `/` from the scanner container. e.g. http://mycontainer:9000 Use it only if no container name was given.
+* `SONARQUBE_LOCAL_URL`: URL of `lequal/sonarqube` container if already running without trailing `/` from the host. e.g. http://localhost:9000
+* `SONARQUBE_TAG`: the tag of the `lequal/sonarqube` image to use. e.g. latest
+* `SONARQUBE_NETWORK`: the name of the docker bridge used.
 
 ## How to add a new test
 
