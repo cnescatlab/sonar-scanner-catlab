@@ -10,7 +10,7 @@ This image is a pre-configured sonar-scanner image derived from [Docker-CAT](htt
 
 SonarQube itself is an opensource project on GitHub : [SonarSource/sonarqube](https://github.com/SonarSource/sonarqube).
 
-For versions and changelog: [GitHub Releases](https://github.com/lequal/sonarqube/releases).
+For versions and changelog: [GitHub Releases](https://github.com/lequal/sonar-scanner/releases).
 
 ## Features
 
