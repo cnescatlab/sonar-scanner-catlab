@@ -9,7 +9,11 @@
 sensors=(
     "INFO: Sensor Sonar i-Code \[icode\]"
 )
-test_language "Fortran 77" "f77" "fortran77" sensors "fortran77-dummy-project" 11
+
+if ! test_language "Fortran 77" "f77" "fortran77" sensors "fortran77-dummy-project" 11;
+then
+    exit 1
+fi
 
 test_language "Fortran 90" "f90" "fortran90" sensors "fortran90-dummy-project" 14
 
