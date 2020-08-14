@@ -34,36 +34,8 @@
 #   $ ./tests/run_tests.bash
 #   $ SONARQUBE_CONTAINER_NAME=lequalsonarqube_sonarqube_1 SONARQUBE_ADMIN_PASSWORD=pass SONARQUBE_TAG=develop ./tests/run_tests.bash --no-run
 
-# Default values of environment variables
-if [ -z "$SONARQUBE_CONTAINER_NAME" ]
-then
-    export SONARQUBE_CONTAINER_NAME=lequalsonarqube
-fi
-
-if [ -z "$SONARQUBE_ADMIN_PASSWORD" ]
-then
-    export SONARQUBE_ADMIN_PASSWORD="adminpassword"
-fi
-
-if [ -z "$SONARQUBE_URL" ]
-then
-    export SONARQUBE_URL="http://$SONARQUBE_CONTAINER_NAME:9000"
-fi
-
-if [ -z "$SONARQUBE_LOCAL_URL" ]
-then
-    export SONARQUBE_LOCAL_URL="http://localhost:9000"
-fi
-
-if [ -z "$SONARQUBE_TAG" ]
-then
-    export SONARQUBE_TAG=latest
-fi
-
-if [ -z "$SONARQUBE_NETWORK" ]
-then
-    export SONARQUBE_NETWORK=sonarbridge
-fi
+# Include default values of environment variables and functions
+. tests/functions.bash
 
 # Unless required not to, a container is run
 if [ "$1" != "--no-server-run" ]
@@ -83,17 +55,13 @@ then
     atexit()
     {
         docker container stop "$SONARQUBE_CONTAINER_NAME" > /dev/null
-        docker network rm "$SONARQUBE_NETWORK"
+        docker network rm "$SONARQUBE_NETWORK"  > /dev/null
     }
     trap atexit EXIT
 fi
 
 # Wait the configuration of the image before running the tests
-while ! docker container logs "$SONARQUBE_CONTAINER_NAME" 2>&1 | grep -q '\[INFO\] CNES SonarQube: ready!'
-do
-    echo "Waiting for SonarQube to be UP."
-    sleep 5
-done
+wait_cnes_sonarqube_ready "$SONARQUBE_CONTAINER_NAME"
 
 # Prepare the cache folder
 mkdir -p .sonarcache
@@ -117,6 +85,6 @@ do
         ((nb_test++))
     fi
 done
-echo "$failed tests failed out of $nb_test"
+log "$INFO" "$failed tests failed out of $nb_test"
 
 exit $failed

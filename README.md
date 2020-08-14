@@ -1,7 +1,8 @@
 # CNES sonar-scanner image \[client\]
 
-![](https://github.com/lequal/sonar-scanner/workflows/CI/badge.svg?branch=develop)
-![](https://github.com/lequal/sonar-scanner/workflows/CD/badge.svg?branch=develop)
+![](https://github.com/lequal/sonar-scanner/workflows/CI/badge.svg)
+![](https://github.com/lequal/sonar-scanner/workflows/CD/badge.svg)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/f5f71dea84ce4020ab15a99fc841a696)](https://www.codacy.com/gh/lequal/sonar-scanner?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=lequal/sonar-scanner&amp;utm_campaign=Badge_Grade)
 
 > Docker environment containing open source code analysis tools configured by CNES and dedicated to Continuous Integration.
 
@@ -9,7 +10,7 @@ This image is a pre-configured sonar-scanner image derived from [Docker-CAT](htt
 
 SonarQube itself is an opensource project on GitHub : [SonarSource/sonarqube](https://github.com/SonarSource/sonarqube).
 
-For versions and changelog: [GitHub Releases](https://github.com/lequal/sonarqube/releases).
+For versions and changelog: [GitHub Releases](https://github.com/lequal/sonar-scanner/releases).
 
 ## Features
 
@@ -18,7 +19,7 @@ This image is based on the official sonar-scanner image, namely [sonarsource/son
 Additional features are:
 
 * Embedded tools
-  * Coming soon...
+    * Coming soon...
 
 _This image is made to be used in conjunction with a pre-configured SonarQube server image that embeds all necessary plugins and configuration: [lequal/sonarqube](https://github.com/lequal/sonarqube). It is, however, not mandatory to use it._
 
@@ -34,7 +35,6 @@ This image is based on the official SonarQube [sonar-scanner-cli docker image](h
     ```sh
     $ docker run \
             --rm \
-            --name lequalscanner \
             -u "$(id -u):$(id -g)" \
             -e SONAR_HOST_URL="url of your SonarQube instance" \
             -v "$(pwd):/usr/src" \
