@@ -112,7 +112,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ needs.deliverability.outputs.version }}
-          release_name: Image ${{ env.DOCKER_IMAGE_NAME }}:${{ needs.deliverability.outputs.version }}
+          release_name: ${{ env.DOCKER_IMAGE_NAME }}:${{ needs.deliverability.outputs.version }}
           body_path: changelog.md
       # Close the milestone (that is now 100% completed)
       - name: Close milestone
