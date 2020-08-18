@@ -58,7 +58,7 @@ log()
     then
         echo "$msg"
     else
-        >&2 echo "$msg" ", raised by ${0##*/}"
+        >&2 echo "$msg, raised by ${0##*/}"
     fi
 }
 

@@ -3,8 +3,6 @@
 # This workflow builds a docker image each time
 # commits are pushed to GitHub or a pull request is opened.
 # It also runs a container of this image to test it.
-# Moreover, the hadolint linter is run on the Dockerfile and
-# the yamllint linter is run on the whole project.
 ---
 name: CI
 
@@ -27,8 +25,7 @@ on:
 env:
   DOCKERFILE_PATH: '.'
   DOCKERFILE_FILENAME: 'Dockerfile'
-  DOCKER_IMAGE_NAME: ${{ github.repository }}
-  HADOLINT_VERSION: 'v1.18.0'
+  DOCKER_IMAGE_NAME: 'lequal/sonar-scanner'
 
 jobs:
   # Job that builds the image and upload it as an artifact
@@ -77,10 +74,10 @@ jobs:
             branch=${{ github.head_ref }}
           fi
           echo "Cloning the server repo on branch $branch..."
-          if ! git clone https://github.com/lequal/sonarqube.git -b "$branch" tmpserver;
+          if ! git clone https://github.com/cnescatlab/sonarqube.git -b "$branch" tmpserver;
           then
             echo "No branch $branch found on the server repository, using develop"
-            git clone https://github.com/lequal/sonarqube.git -b develop tmpserver
+            git clone https://github.com/cnescatlab/sonarqube.git -b develop tmpserver
           fi
           echo "Building the server image..."
           docker build -t lequal/sonarqube:latest tmpserver/
