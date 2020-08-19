@@ -96,8 +96,8 @@ wait_cnes_sonarqube_ready()
 #   4: array of lines of sensors to look for in the scanner output
 #   5: project key (sonar.projectKey of sonar-project.properties)
 #   6: number of issues with the Sonar way Quality Profile
-#   7: name of the CNES Quality Profile to apply, if any
-#   8: number of issues with the CNES Quality Profile
+#   7: (optional) name of the CNES Quality Profile to apply, if any
+#   8: (optional) number of issues with the CNES Quality Profile, if specified
 #
 # Environment variables used:
 #   * SONARQUBE_URL
@@ -160,21 +160,23 @@ test_language()
     then
         log "$ERROR" "Failed: the project is not on the server."
         log "$ERROR" "curl -su admin:$SONARQUBE_ADMIN_PASSWORD $SONARQUBE_LOCAL_URL/api/projects/search?projects=$projectKey"
-        >&2 echo -e "$output"
+        echo -e "$output" | >&2 jq
         return 1
     fi
 
     # Get the number of issues of the project
     output=$(curl -su "admin:$SONARQUBE_ADMIN_PASSWORD" \
                     "$SONARQUBE_LOCAL_URL/api/issues/search?componentKeys=$projectKey")
-    issues=$(echo -e "$output" | jq '.issues | map(select(.status == "OPEN")) | length')
+    issues=$(echo -e "$output" | jq '.issues | map(select(.status == "OPEN" or .status == "TO_REVIEW")) | length')
     if [ "$issues" -ne "$nbIssues" ]
     then
-        log "$ERROR" "Failed: there should be $nbIssues issues on the $languageName dummy project with the Sonar way QP."
+        log "$ERROR" "Failed: there should be $nbIssues issues on the $languageName dummy project with the Sonar way QP but $issues were found"
         log "$ERROR" "curl -su admin:$SONARQUBE_ADMIN_PASSWORD $SONARQUBE_LOCAL_URL/api/issues/search?componentKeys=$projectKey"
-        >&2 echo -e "$output"
+        echo -e "$output" | >&2 jq
         return 1
     fi
+
+    log "$INFO" "Analysis with Sonar way QP ran as expected."
 
     # If the language does not have any CNES QP, the test ends
     if [ -z "$cnesQp" ]
@@ -213,15 +215,61 @@ test_language()
     # Get the new number of issues
     output=$(curl -su "admin:$SONARQUBE_ADMIN_PASSWORD" \
                     "$SONARQUBE_LOCAL_URL/api/issues/search?componentKeys=$projectKey")
-    issues=$(echo -e "$output" | jq '.issues | map(select(.status == "OPEN")) | length')
+    issues=$(echo -e "$output" | jq '.issues | map(select(.status == "OPEN"  or .status == "TO_REVIEW")) | length')
     if [ "$issues" -ne "$nbIssuesCnesQp" ]
     then
-        log "$ERROR" "Failed: there should be $nbIssuesCnesQp issues on the $languageName dummy project with the $cnesQp QP."
+        log "$ERROR" "Failed: there should be $nbIssuesCnesQp issues on the $languageName dummy project with the $cnesQp QP but $issues were found"
         log "$ERROR" "curl -su admin:$SONARQUBE_ADMIN_PASSWORD $SONARQUBE_LOCAL_URL/api/issues/search?componentKeys=$projectKey"
-        >&2 echo -e "$output"
+        echo -e "$output" | >&2 jq
         return 1
     fi
 
+    log "$INFO" "Analysis with $cnesQp QP ran as expected."
     log "$INFO" "Analyses succeeded, $languageName is supported."
+    return 0
+}
+
+# test_analysis_tool
+#
+# This function tests that the image can run a
+# specified code analyzer and that it keeps producing
+# the same result given the same source code.
+#
+# Parameters:
+#   1: tool name
+#   2: tool command line
+#   3: analysis results reference file
+#   4: temporary results file
+#
+# Example:
+#   $ cmd="pylint -f json --rcfile=/opt/python/pylintrc_RNC_sonar_2017_A_B tests//src/*.py"
+#   $ test_analysis_tool "pylint" "$cmd" "tests/python/reference-pylint-results.json" "tests/python/tmp-pylint-results.json"
+test_analysis_tool()
+{
+    # Args
+    tool=$1
+    cmd=$2
+    ref_file=$3
+    tmp_file=$4
+
+    # Run an analysis with the tool
+    docker run --rm -u "$(id -u):$(id -g)" \
+                -v "$(pwd):/usr/src" \
+                lequal/sonar-scanner \
+                $cmd \
+                    > "$tmp_file"
+
+    # Compare result of the analysis with the reference
+    if ! diff "$tmp_file" "$ref_file";
+    then
+        log "$ERROR" "Failed: $tool reports are different."
+        log "$ERROR" "=== Result ==="
+        >&2 cat "$tmp_file"
+        log "$ERROR" "=== Reference ==="
+        >&2 cat "$ref_file"
+        return 1
+    fi
+
+    log "$INFO" "Analysis succeeded, $tool works as expected."
     return 0
 }
