@@ -1,6 +1,6 @@
 # Test documentation
 
-The `tests/` folder contains both the tests scripts and some dummy projects to analyze.
+The `tests/` folder contains both test scripts and some dummy projects to analyze.
 
 ## List of scripted integration tests
 
@@ -16,10 +16,16 @@ The `tests/` folder contains both the tests scripts and some dummy projects to a
 1. Fortran
     * file: fortran.bash
     * purpose: Check that the Fortran 77 and 90 languages are supported and that the right plugins are executed.
+1. Python
+    * file: python.bash
+    * purpose: Check that the Python language is supported and that CNES Quality Profiles are usable.
+1. Pylint
+    * file: pylint.bash
+    * purpose: Check that Pylint can be launched from within the container to analyze Python projects.
 
 ### How to run all the tests
 
-Before testing the image, it must be built (see above).
+Before testing the image, it must be built (see the [README](https://github.com/cnescatlab/sonar-scanner#how-to-build-the-image)).
 
 To run the tests, the following tools are required:
 
@@ -57,9 +63,9 @@ $ ./tests/run_tests.bash
       ```
 * Run a test script with 
     * ```sh
-      $ ./tests/shell1.bash
+      $ ./tests/shell.bash
       # Environment variables may be modified
-      SONARQUBE_ADMIN_PASSWORD=pass ./tests/shell1.bash
+      SONARQUBE_ADMIN_PASSWORD=pass ./tests/shell.bash
       ```
 * Test the exit status of the script with `echo $?`
     * zero => success
@@ -87,7 +93,7 @@ To add a test:
 1. Create a file under the `tests/` folder
 1. Make it executable (with `chmod u+x tests/my_test.bash` for instance)
 1. Edit the script.
-1. To indicate wether the test has failed or succeed, use the exit status
+1. To indicate whether the test has failed or succeed, use the exit status
     * zero => success
     * non-zero => failure
 1. Add the test to the [list](#list-of-scripted-integration-tests)
