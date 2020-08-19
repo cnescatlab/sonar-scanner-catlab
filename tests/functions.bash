@@ -248,7 +248,7 @@ test_analysis_tool()
 {
     # Args
     tool=$1
-    cmd=$2
+    cmd=($2)
     ref_file=$3
     tmp_file=$4
 
@@ -256,7 +256,7 @@ test_analysis_tool()
     docker run --rm -u "$(id -u):$(id -g)" \
                 -v "$(pwd):/usr/src" \
                 lequal/sonar-scanner \
-                $cmd \
+                "${cmd[@]}" \
                     > "$tmp_file"
 
     # Compare result of the analysis with the reference
