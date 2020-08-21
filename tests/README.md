@@ -22,6 +22,9 @@ The `tests/` folder contains both test scripts and some dummy projects to analyz
 1. Pylint
     * file: pylint.bash
     * purpose: Check that Pylint can be launched from within the container to analyze Python projects.
+1. Import pylint results in SonarQube
+    * file: import_pylint_results.bash
+    * purpose: Check that issues revealed by a pylint analysis can be imported in SonarQube.
 
 ### How to run all the tests
 
@@ -47,10 +50,10 @@ $ ./tests/run_tests.bash
       ```
 1. Run a container of the SonarQube server
     * ```sh
-      docker run --name "$SONARQUBE_CONTAINER_NAME" \
+      docker run --name lequalsonarqube \
               -d --rm \
               -p 9000:9000 \
-              -e SONARQUBE_ADMIN_PASSWORD="$SONARQUBE_ADMIN_PASSWORD" \
+              -e SONARQUBE_ADMIN_PASSWORD=adminpassword \
               --net sonarbridge \
               lequal/sonarqube:latest
       ```
@@ -58,7 +61,7 @@ $ ./tests/run_tests.bash
     * The message `[INFO] CNES SonarQube: ready!` is logged.
     * To see the logs of a container running in background
       ```sh
-      $ docker container logs -f "$SONARQUBE_CONTAINER_NAME"
+      $ docker container logs -f lequalsonarqube
       Ctrl-C # once the container is ready
       ```
 * Run a test script with 

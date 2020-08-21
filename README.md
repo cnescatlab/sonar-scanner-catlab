@@ -75,7 +75,7 @@ There are 3 `pylintrc` embedded in the image under `/opt/python`:
 * `pylintrc_RNC_sonar_2017_C`
 * `pylintrc_RNC_sonar_2017_D`
 
-To use one of this file when running pylint from within the container:
+To use one of these files when running pylint from within the container:
 
 ```sh
 # pylint with a CNES pylintrc
@@ -87,6 +87,8 @@ $ docker run \
         pylint --rcfile=/opt/python/pylintrc_RNC_sonar_2017_A_B my-script.py
 # where my-script.py is a python module in the current working directory
 ```
+
+To import pylint results in SonarQube see the [official documentation](https://docs.sonarqube.org/7.9/analysis/languages/python/#header-3). (Summed up: activate at least one pylint rule in the Quality Profile the project uses for Python and set `sonar.python.pylint.reportPath` in `sonar-project.properties`.)
 
 ### Examples usage in CI
 
