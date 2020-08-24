@@ -19,7 +19,9 @@ This image is based on the official sonar-scanner image, namely [sonarsource/son
 Additional features are:
 
 * Embedded tools
-    * Coming soon...
+    * see the [list](#analysis-tools-included)
+* Configuration files
+    * [pylintrc](#how-to-use-embedded-CNES-pylintrc)
 
 _This image is made to be used in conjunction with a pre-configured SonarQube server image that embeds all necessary plugins and configuration: [cnescatlab/sonarqube](https://github.com/cnescatlab/sonarqube). It is, however, not mandatory to use it._
 
@@ -65,9 +67,32 @@ $ docker run \
 
 For information on how to use these tools, refer to the official documentation of the tool.
 
+#### How to use embedded CNES pylintrc
+
+There are 3 `pylintrc` embedded in the image under `/opt/python`:
+
+* `pylintrc_RNC_sonar_2017_A_B`
+* `pylintrc_RNC_sonar_2017_C`
+* `pylintrc_RNC_sonar_2017_D`
+
+To use one of these files when running pylint from within the container:
+
+```sh
+# pylint with a CNES pylintrc
+$ docker run \
+        --rm \
+        -u "$(id -u):$(id -g)" \
+        -v "$(pwd):/usr/src" \
+        lequal/sonar-scanner \
+        pylint --rcfile=/opt/python/pylintrc_RNC_sonar_2017_A_B my-script.py
+# where my-script.py is a python module in the current working directory
+```
+
+To import pylint results in SonarQube see the [official documentation](https://docs.sonarqube.org/7.9/analysis/languages/python/#header-3). (Summed up: activate at least one pylint rule in the Quality Profile the project uses for Python and set `sonar.python.pylint.reportPath` in `sonar-project.properties`.)
+
 ### Examples usage in CI
 
-This image was made for CI, hence here are some examples.
+This image was made for CI, hence here are some examples. Make sur to use the right URL for your SonarQube instance instead of `my-sonarqube.com`.
 
 _These examples still need to be tested._
 
@@ -176,6 +201,8 @@ sonar-scanning:
 |--------------------------------------------------------------------------------|----------------------|
 | [sonar-scanner](https://docs.sonarqube.org/latest/analysis/scan/sonarscanner/) | 4.4.0.2170           |
 | [ShellCheck](https://github.com/koalaman/shellcheck)                           | 0.7.0                |
+| [pylint](http://pylint.pycqa.org/en/latest/user_guide/index.html)              | 2.5.0                |
+| [CNES pylint extension](https://github.com/cnescatlab/cnes-pylint-extension)   | 5.0.0                |
 
 ## Developer's guide
 
@@ -203,6 +230,8 @@ If you want to do a PR, please put inside of it the reason of this pull request.
 All details are available in [CONTRIBUTING](https://github.com/cnescatlab/.github/blob/master/CONTRIBUTING.md).
 
 Bugs and feature requests: [issues](https://github.com/cnescatlab/sonar-scanner/issues)
+
+To contribute to the project, read [this](https://github.com/cnescatlab/.github/wiki/CATLab's-Workflows) about CATLab's workflows for Docker images.
 
 ## License
 

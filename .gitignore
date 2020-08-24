@@ -3,4 +3,4 @@
 .scannerwork/
 
 # ignore results of tools
-tmp*results.xml
+tmp*results.*
