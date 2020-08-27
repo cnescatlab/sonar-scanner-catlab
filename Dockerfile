@@ -1,4 +1,20 @@
-# This image is based on the official sonar-scanner image
+# Builder image for other analysis tools
+FROM sonarsource/sonar-scanner-cli:4.4 AS builder
+
+# CppCheck
+ADD https://netix.dl.sourceforge.net/project/cppcheck/cppcheck/1.90/cppcheck-1.90.tar.gz \
+    .
+
+RUN apk add --no-cache \
+        alpine-sdk \
+        pcre-dev \
+    && tar -zxvf cppcheck-1.90.tar.gz \
+    && cd cppcheck-1.90/ \
+    && make install MATCHCOMPILER="yes" FILESDIR="/usr/share/cppcheck" HAVE_RULES="yes" CXXFLAGS="-O2 -DNDEBUG -Wall -Wno-sign-compare -Wno-unused-function -Wno-deprecated-declarations"
+
+################################################################################
+
+# Final image based on the official sonar-scanner image
 FROM sonarsource/sonar-scanner-cli:4.4
 
 LABEL maintainer="CATLab <catlab@cnes.fr>"
@@ -34,3 +50,18 @@ RUN apk add --no-cache --virtual .pylint-build-deps \
     && apk del --purge .pylint-build-deps
 
 ENV PYTHONPATH $PYTHONPATH:/opt/python/cnes-pylint-extension-5.0.0/checkers/
+
+# Add CppCheck from builder stage
+COPY --from=builder /usr/share/cppcheck /usr/share/cppcheck
+COPY --from=builder /usr/bin/cppcheck /usr/bin
+COPY --from=builder /usr/bin/cppcheck-htmlreport /usr/bin
+
+RUN apk add --no-cache \
+        pcre \
+        libstdc++
+
+# Set default report path for CppCheck, Vera++ and RATS
+RUN echo '#----- Default report path for C/C++ analysis tools' >> /opt/sonar-scanner/conf/sonar-scanner.properties \
+    && echo 'sonar.cxx.cppcheck.reportPath=cppcheck-report.xml' >> /opt/sonar-scanner/conf/sonar-scanner.properties \
+    && echo 'sonar.cxx.vera.reportPath=vera-report.xml' >> /opt/sonar-scanner/conf/sonar-scanner.properties \
+    && echo 'sonar.cxx.rats.reportPath=rats-report.xml' >> /opt/sonar-scanner/conf/sonar-scanner.properties

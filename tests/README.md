@@ -25,6 +25,15 @@ The `tests/` folder contains both test scripts and some dummy projects to analyz
 1. Import pylint results in SonarQube
     * file: import_pylint_results.bash
     * purpose: Check that issues revealed by a pylint analysis can be imported in SonarQube.
+1. C/C++
+    * file: c_cpp.bash
+    * purpose: Check that the C and C++ languages are supported and that CNES Quality Profiles are usable.
+1. CppCheck
+    * file: cppcheck.bash
+    * purpose: Check that cppcheck can be launched from within the container to analyze C/C++ projects.
+1. Import CppCheck results
+    * file: import_cppcheck_results.bash
+    * purpose: Check that issues revealed by a cppcheck analysis can be imported in SonarQube.
 
 ### How to run all the tests
 
@@ -50,7 +59,7 @@ $ ./tests/run_tests.bash
       ```
 1. Run a container of the SonarQube server
     * ```sh
-      docker run --name lequalsonarqube \
+      $ docker run --name lequalsonarqube \
               -d --rm \
               -p 9000:9000 \
               -e SONARQUBE_ADMIN_PASSWORD=adminpassword \
@@ -68,7 +77,7 @@ $ ./tests/run_tests.bash
     * ```sh
       $ ./tests/shell.bash
       # Environment variables may be modified
-      SONARQUBE_ADMIN_PASSWORD=pass ./tests/shell.bash
+      $ SONARQUBE_ADMIN_PASSWORD=pass ./tests/shell.bash
       ```
 * Test the exit status of the script with `echo $?`
     * zero => success

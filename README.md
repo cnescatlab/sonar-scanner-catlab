@@ -203,6 +203,7 @@ sonar-scanning:
 | [ShellCheck](https://github.com/koalaman/shellcheck)                           | 0.7.0                |
 | [pylint](http://pylint.pycqa.org/en/latest/user_guide/index.html)              | 2.5.0                |
 | [CNES pylint extension](https://github.com/cnescatlab/cnes-pylint-extension)   | 5.0.0                |
+| [CppCheck](https://github.com/danmar/cppcheck)                                 | 1.90                 |
 
 ## Developer's guide
 

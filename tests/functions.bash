@@ -150,7 +150,7 @@ test_language()
     done
 
     # Wait for SonarQube to process the results
-    sleep 5
+    sleep 8
 
     # Check that the project was added to the server
     output=$(curl -su "admin:$SONARQUBE_ADMIN_PASSWORD" \
@@ -203,7 +203,7 @@ test_language()
                 2>&1
 
     # Wait for SonarQube to process the results
-    sleep 5
+    sleep 8
 
     # Switch back to the Sonar way QP (in case the test needs to be rerun)
     curl -su "admin:$SONARQUBE_ADMIN_PASSWORD" \
@@ -240,6 +240,7 @@ test_language()
 #   2: tool command line
 #   3: analysis results reference file
 #   4: temporary results file
+#   5: (optional) store the standard output in the temporary result file, either "yes" or "no" (default: "yes")
 #
 # Example:
 #   $ cmd="pylint -f json --rcfile=/opt/python/pylintrc_RNC_sonar_2017_A_B tests//src/*.py"
@@ -251,13 +252,22 @@ test_analysis_tool()
     cmd=($2)
     ref_file=$3
     tmp_file=$4
+    store_output=$5
 
     # Run an analysis with the tool
-    docker run --rm -u "$(id -u):$(id -g)" \
-                -v "$(pwd):/usr/src" \
-                lequal/sonar-scanner \
-                "${cmd[@]}" \
-                    > "$tmp_file"
+    if [ "$store_output" = "no" ]
+    then
+        docker run --rm -u "$(id -u):$(id -g)" \
+                    -v "$(pwd):/usr/src" \
+                    lequal/sonar-scanner \
+                    "${cmd[@]}"
+    else
+        docker run --rm -u "$(id -u):$(id -g)" \
+                    -v "$(pwd):/usr/src" \
+                    lequal/sonar-scanner \
+                    "${cmd[@]}" \
+                        > "$tmp_file"
+    fi
 
     # Compare result of the analysis with the reference
     if ! diff "$tmp_file" "$ref_file";
