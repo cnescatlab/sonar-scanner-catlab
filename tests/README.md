@@ -34,6 +34,12 @@ The `tests/` folder contains both test scripts and some dummy projects to analyz
 1. Import CppCheck results
     * file: import_cppcheck_results.bash
     * purpose: Check that issues revealed by a cppcheck analysis can be imported in SonarQube.
+1. Vera++
+    * file: vera.bash
+    * purpose: Check that vera++ can be launched from within the container to analyze C/C++ projects.
+1. Import Vera++ results
+    * file: import_vera_results.bash
+    * purpose: Check that issues revealed by vera++ and activated in the Quality Profile can be imported in SonarQube.
 
 ### How to run all the tests
 

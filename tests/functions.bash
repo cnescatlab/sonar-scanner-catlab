@@ -283,3 +283,110 @@ test_analysis_tool()
     log "$INFO" "Analysis succeeded, $tool works as expected."
     return 0
 }
+
+# test_import_analysis_results
+#
+# This function tests that the analysis results produced
+# by an analysis tool can be imported in SonarQube. The results
+# must be stored in the default file.
+#
+# Parameters:
+#   1: tool name
+#   2: project name
+#   3: project key
+#   4: quality profile to use
+#   5: language key
+#   6: folder to run the sonar-scanner in (relative to the root of the project)
+#   7: folder containing the source files (relative to the previous folder)
+#   8: id of a rule violated by a source file
+#   9: line of output of the sonar-scanner that tells the import sensor is used
+#
+# Example:
+#   $ ruleViolated="cppcheck:arrayIndexOutOfBounds"
+#   $ expected_sensor="INFO: Sensor C++ (Community) CppCheckSensor \[cxx\]"
+#   $ test_import_analysis_results "CppCheck" "CppCheck Dummy Project" "cppcheck-dummy-project" "CNES_C_A" "c++" "tests/c_cpp" "cppcheck" "$ruleViolated" "$expected_sensor"
+test_import_analysis_results()
+{
+    # Args
+    analyzerName=$1
+    projectName=$2
+    projectKey=$3
+    qualityProfile=$4
+    languageKey=$5
+    languageFolder=$6
+    sourceFolder=$7
+    ruleViolated=$8
+    expected_sensor=$9
+
+    # Create a project on SonarQube
+    res=$(curl -su "admin:$SONARQUBE_ADMIN_PASSWORD" \
+                --data-urlencode "name=$projectName" \
+                --data-urlencode "project=$projectKey" \
+                "$SONARQUBE_LOCAL_URL/api/projects/create")
+    if [ -n "$res" ] && [ "$(echo "$res" | jq -r '.errors | length')" -gt 0 ]
+    then
+        log "$ERROR" "Cannot create a project with key $projectKey because: $(echo "$res" | jq -r '.errors[0].msg')"
+        return 1
+    fi
+
+    # Set its Quality Profile for the given language to the given one
+    res=$(curl -su "admin:$SONARQUBE_ADMIN_PASSWORD" \
+                --data-urlencode "language=$languageKey" \
+                --data-urlencode "project=$projectKey" \
+                --data-urlencode "qualityProfile=$qualityProfile" \
+                "$SONARQUBE_LOCAL_URL/api/qualityprofiles/add_project")
+    if [ -n "$res" ] && [ "$(echo "$res" | jq -r '.errors | length')" -gt 0 ]
+    then
+        log "$ERROR" "Cannot set Quality profile of project $projectKey to $qualityProfile for $languageKey language because: $(echo "$res" | jq -r '.errors[0].msg')"
+        return 1
+    fi
+
+    # Analyse the project and collect the analysis files (that match the default name)
+    analysis_output=$(docker run --rm -u "$(id -u):$(id -g)" \
+                                -e SONAR_HOST_URL="$SONARQUBE_URL" \
+                                --net "$SONARQUBE_NETWORK" \
+                                -v "$PWD:/usr/src" \
+                                -v "$PWD/.sonarcache:/opt/sonar-scanner/.sonar/cache" \
+                                lequal/sonar-scanner \
+                                    "-Dsonar.projectBaseDir=/usr/src/$languageFolder" \
+                                    "-Dsonar.projectKey=$projectKey" \
+                                    "-Dsonar.projectName=$projectName" \
+                                    "-Dsonar.projectVersion=1.0" \
+                                    "-Dsonar.sources=$sourceFolder" \
+                                        2>&1)
+    if ! echo -e "$analysis_output" | grep -q "$expected_sensor";
+    then
+        log "$ERROR" "Failed: the output of the scanner miss the line: $expected_sensor"
+        >&2 echo -e "$analysis_output"
+        return 1
+    else
+        echo -e "$analysis_output"
+    fi
+
+    # Wait for SonarQube to process the results
+    sleep 8
+
+    # Check that the issue was added to the project
+    nbIssues=$(curl -su "admin:$SONARQUBE_ADMIN_PASSWORD" \
+                            "$SONARQUBE_LOCAL_URL/api/issues/search?componentKeys=$projectKey" \
+                        | jq -r ".issues | map(select(.rule == \"$ruleViolated\")) | length")
+    if [ "$nbIssues" -ne 1 ]
+    then
+        log "$ERROR" "An issue should have been raised by the rule $ruleViolated"
+        curl -su "admin:$SONARQUBE_ADMIN_PASSWORD" "$SONARQUBE_LOCAL_URL/api/issues/search?componentKeys=$projectKey" | >&2 jq
+        return 1
+    fi
+
+    # Delete the project
+    res=$(curl -su "admin:$SONARQUBE_ADMIN_PASSWORD" \
+                --data-urlencode "project=$projectKey" \
+                "$SONARQUBE_LOCAL_URL/api/projects/delete")
+    if [ -n "$res" ] && [ "$(echo "$res" | jq -r '.errors | length')" -gt 0 ]
+    then
+        log "$ERROR" "Cannot delete the project $projectKey because: $(echo "$res" | jq -r '.errors[0].msg')"
+        return 1
+    fi
+
+    log "$INFO" "$analyzerName analysis results successfully imported in SonarQube."
+    return 0
+}
