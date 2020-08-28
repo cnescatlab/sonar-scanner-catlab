@@ -82,6 +82,7 @@ jobs:
           echo "Building the server image..."
           docker build -t lequal/sonarqube:latest tmpserver/
           echo "Testing the scanner image..."
+          echo -e "Results of the CI pipeline\n" > tests_logs.txt
           ./tests/run_tests.bash |& sed -e '/Waiting for CNES SonarQube to be ready./ d' | tee -a tests_logs.txt
       # Publish test results in the pull request discussion
       - name: Comment the Pull Request
@@ -91,3 +92,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           header: CI tests results
           path: tests_logs.txt
+      # Have the job fail if at least one test failed
+      - name: Check all tests passed
+        run: grep -q "0 tests failed" tests_logs.txt
