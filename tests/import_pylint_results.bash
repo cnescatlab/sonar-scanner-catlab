@@ -100,7 +100,7 @@ do
 done
 
 # Wait for SonarQube to process the results
-sleep 5
+sleep 8
 
 # Check that the issue was added to the project
 nbPylintIssues=$(curl -su "admin:$SONARQUBE_ADMIN_PASSWORD" \

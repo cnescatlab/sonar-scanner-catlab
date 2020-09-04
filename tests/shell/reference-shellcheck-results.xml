@@ -25,7 +25,7 @@
 <error line='16' column='6' severity='error' message='Instead of &#91; a &#38;&#38; b &#93;&#44; use &#91; a &#93; &#38;&#38; &#91; b &#93;.' source='ShellCheck.SC2107' />
 <error line='16' column='9' severity='warning' message='m is referenced but not assigned.' source='ShellCheck.SC2154' />
 <error line='16' column='9' severity='info' message='Double quote to prevent globbing and word splitting.' source='ShellCheck.SC2086' />
-<error line='17' column='1' severity='warning' message='Shells disambiguate &#40;&#40; differently or not at all. For subshell&#44; add spaces around &#40; . For &#40;&#40;&#44; fix parsing errors.' source='ShellCheck.SC1105' />
+<error line='17' column='1' severity='error' message='Shells disambiguate &#40;&#40; differently or not at all. For subshell&#44; add spaces around &#40; . For &#40;&#40;&#44; fix parsing errors.' source='ShellCheck.SC1105' />
 <error line='17' column='2' severity='warning' message='&#40;..&#41; is a subshell. Did you mean &#91; .. &#93;&#44; a test expression&#63;' source='ShellCheck.SC2205' />
 <error line='17' column='6' severity='error' message='In arithmetic contexts&#44; use &#60; instead of &#45;lt' source='ShellCheck.SC1106' />
 <error line='18' column='18' severity='error' message='Missing &#39;&#59;&#39; or &#43; terminating &#45;exec. You can&#39;t use &#124;/&#124;&#124;/&#38;&#38;&#44; and &#39;&#59;&#39; has to be a separate&#44; quoted argument.' source='ShellCheck.SC2067' />
@@ -56,7 +56,7 @@
 <error line='37' column='7' severity='warning' message='In POSIX sh&#44; arrays are undefined.' source='ShellCheck.SC2039' />
 <error line='37' column='24' severity='warning' message='Expanding an array without an index only gives the first element.' source='ShellCheck.SC2128' />
 <error line='38' column='8' severity='warning' message='This format string has 2 variables&#44; but is passed 1 arguments.' source='ShellCheck.SC2183' />
-<error line='39' column='8' severity='info' message='Don&#39;t use variables in the printf format string. Use printf &#34;..&#37;s..&#34; &#34;&#36;foo&#34;.' source='ShellCheck.SC2059' />
+<error line='39' column='8' severity='info' message='Don&#39;t use variables in the printf format string. Use printf &#39;..&#37;s..&#39; &#34;&#36;foo&#34;.' source='ShellCheck.SC2059' />
 <error line='39' column='15' severity='warning' message='name is referenced but not assigned.' source='ShellCheck.SC2154' />
 <error line='40' column='12' severity='error' message='Delete trailing spaces after &#92; to break line &#40;or use quotes for literal space&#41;.' source='ShellCheck.SC1101' />
 <error line='42' column='10' severity='info' message='Increase precision by replacing a/b&#42;c with a&#42;c/b.' source='ShellCheck.SC2017' />

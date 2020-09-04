@@ -200,10 +200,11 @@ sonar-scanning:
 | Tool                                                                           | Version              | 
 |--------------------------------------------------------------------------------|----------------------|
 | [sonar-scanner](https://docs.sonarqube.org/latest/analysis/scan/sonarscanner/) | 4.4.0.2170           |
-| [ShellCheck](https://github.com/koalaman/shellcheck)                           | 0.7.0                |
+| [ShellCheck](https://github.com/koalaman/shellcheck)                           | 0.7.1                |
 | [pylint](http://pylint.pycqa.org/en/latest/user_guide/index.html)              | 2.5.0                |
 | [CNES pylint extension](https://github.com/cnescatlab/cnes-pylint-extension)   | 5.0.0                |
 | [CppCheck](https://github.com/danmar/cppcheck)                                 | 1.90                 |
+| [Vera++](https://bitbucket.org/verateam/vera/wiki/Home)                        | 1.2.1                |
 
 ## Developer's guide
 
