@@ -205,6 +205,7 @@ sonar-scanning:
 | [CNES pylint extension](https://github.com/cnescatlab/cnes-pylint-extension)   | 5.0.0                |
 | [CppCheck](https://github.com/danmar/cppcheck)                                 | 1.90                 |
 | [Vera++](https://bitbucket.org/verateam/vera/wiki/Home)                        | 1.2.1                |
+| [RATS](https://code.google.com/archive/p/rough-auditing-tool-for-security/)    | 2.4                  |
 
 ## Developer's guide
 

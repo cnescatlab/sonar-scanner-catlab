@@ -300,6 +300,7 @@ test_analysis_tool()
 #   7: folder containing the source files (relative to the previous folder)
 #   8: id of a rule violated by a source file
 #   9: line of output of the sonar-scanner that tells the import sensor is used
+#   10: (optional) "yes" if if the rule violated needs to be activated in the Quality Profile for the import sensor to be run (default "no")
 #
 # Example:
 #   $ ruleViolated="cppcheck:arrayIndexOutOfBounds"
@@ -317,6 +318,36 @@ test_import_analysis_results()
     sourceFolder=$7
     ruleViolated=$8
     expected_sensor=$9
+    activateRule="no"
+    if [ $# -eq 10 ]
+    then
+        shift
+        activateRule=$9
+    fi
+
+    if [ "$activateRule" = "yes" ]
+    then
+        # Get the key of the Quality Profile to use
+        qpKey=$(curl -su "admin:$SONARQUBE_ADMIN_PASSWORD" \
+                        "$SONARQUBE_LOCAL_URL/api/qualityprofiles/search?qualityProfile=$qualityProfile" \
+                | jq -r '.profiles[0].key')
+        if [ "$qpKey" = "null" ]
+        then
+            log "$ERROR" "No quality profile named $qualityProfile"
+            exit 1
+        fi
+
+        # Activate the rule in the Quality Profile to allow the Sensor to be used
+        res=$(curl -su "admin:$SONARQUBE_ADMIN_PASSWORD" \
+                    --data-urlencode "key=$qpKey" \
+                    --data-urlencode "rule=$ruleViolated" \
+                    "$SONARQUBE_LOCAL_URL/api/qualityprofiles/activate_rule")
+        if [ -n "$res" ] && [ "$(echo "$res" | jq -r '.errors | length')" -gt 0 ]
+        then
+            log "$ERROR" "Cannot activate rule $ruleViolated in $qualityProfile because: $(echo "$res" | jq -r '.errors[0].msg')"
+            exit 1
+        fi
+    fi
 
     # Create a project on SonarQube
     res=$(curl -su "admin:$SONARQUBE_ADMIN_PASSWORD" \
@@ -385,6 +416,20 @@ test_import_analysis_results()
     then
         log "$ERROR" "Cannot delete the project $projectKey because: $(echo "$res" | jq -r '.errors[0].msg')"
         return 1
+    fi
+
+    if [ "$activateRule" = "yes" ]
+    then
+        # Deactivate the rule in the Quality Profile
+        res=$(curl -su "admin:$SONARQUBE_ADMIN_PASSWORD" \
+                    --data-urlencode "key=$qpKey" \
+                    --data-urlencode "rule=$ruleViolated" \
+                    "$SONARQUBE_LOCAL_URL/api/qualityprofiles/deactivate_rule")
+        if [ -n "$res" ] && [ "$(echo "$res" | jq -r '.errors | length')" -gt 0 ]
+        then
+            log "$ERROR" "Cannot deactivate rule $ruleViolated in $qualityProfile because: $(echo "$res" | jq -r '.errors[0].msg')"
+            exit 1
+        fi
     fi
 
     log "$INFO" "$analyzerName analysis results successfully imported in SonarQube."

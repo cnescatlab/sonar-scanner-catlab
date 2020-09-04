@@ -65,7 +65,7 @@ docker run --rm -u "$(id -u):$(id -g)" \
                         > tests/python/tmp-pylint-results.txt
 if [ ! -e tests/python/tmp-pylint-results.txt ] || [ ! -s tests/python/tmp-pylint-results.txt ]
 then
-    log "$ERROR" "pylint did not produced any result"
+    log "$ERROR" "pylint did not produce any result"
     exit 1
 fi
 

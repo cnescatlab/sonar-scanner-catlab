@@ -4,6 +4,8 @@ FROM debian:10.5-slim AS builder
 # Get sonar-scanner and C/C++ tools sources
 ADD https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.4.0.2170.zip \
     https://downloads.sourceforge.net/project/cppcheck/cppcheck/1.90/cppcheck-1.90.tar.gz \
+    https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/rough-auditing-tool-for-security/rats-2.4.tgz \
+    http://downloads.sourceforge.net/project/expat/expat/2.0.1/expat-2.0.1.tar.gz \
     /
 
 # Compile CppCheck from source
@@ -23,7 +25,21 @@ RUN apt-get update \
             MATCHCOMPILER="yes" \
             FILESDIR="/usr/share/cppcheck" \
             HAVE_RULES="yes" \
-            CXXFLAGS="-O2 -DNDEBUG -Wall -Wno-sign-compare -Wno-unused-function -Wno-deprecated-declarations"
+            CXXFLAGS="-O2 -DNDEBUG -Wall -Wno-sign-compare -Wno-unused-function -Wno-deprecated-declarations" \
+    # Compile RATS (and expat)
+    && tar -xvzf expat-2.0.1.tar.gz \
+    && cd expat-2.0.1 \
+    && ./configure \
+    && make \
+    && make install \
+    && cd .. \
+    && tar -xzvf rats-2.4.tgz \
+    && cd rats-2.4 \
+    && ./configure --with-expat-lib=/usr/local/lib \
+    && make \
+    && make install \
+    && ./rats \
+    && cd ..
 
 ################################################################################
 
@@ -76,6 +92,9 @@ COPY --from=builder /usr/share/cppcheck /usr/share/cppcheck
 COPY --from=builder /usr/bin/cppcheck /usr/bin
 COPY --from=builder /usr/bin/cppcheck-htmlreport /usr/bin
 
+# Add RATS from builder stage
+COPY --from=builder /usr/local /usr/local
+
 # Add CNES pylintrc A_B, C, D
 COPY pylintrc.d/ /opt/python/
 
@@ -94,6 +113,7 @@ RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >
             vera\+\+=1.2.1-* \
             shellcheck=0.7.1-* \
     && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /usr/local/man \
     # Install pylint and CNES pylint extension
     && mkdir -p /opt/python/cnes-pylint-extension-5.0.0 \
     && tar -xvzf /tmp/python/v5.0.0.tar.gz -C /tmp/python \
@@ -111,7 +131,7 @@ RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >
             astroid==2.4.0 \
             pylint==2.5.0
 
-# Make sonar-scanner, CNES pylint and Frama-C executable
+# Make sonar-scanner, CNES pylint and C/C++ tools executable
 ENV PYTHONPATH="$PYTHONPATH:/opt/python/cnes-pylint-extension-5.0.0/checkers" \
     PATH="$SONAR_SCANNER_HOME/bin:/usr/local/bin:$PATH" \
     PYLINTHOME="$SONAR_SCANNER_HOME/.pylint.d"
