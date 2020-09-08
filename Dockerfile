@@ -1,4 +1,4 @@
-# Builder image for other analysis tools
+# Builder image for analysis tools
 FROM debian:10.5-slim AS builder
 
 # Get sonar-scanner and C/C++ tools sources
@@ -6,16 +6,25 @@ ADD https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanne
     https://downloads.sourceforge.net/project/cppcheck/cppcheck/1.90/cppcheck-1.90.tar.gz \
     https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/rough-auditing-tool-for-security/rats-2.4.tgz \
     http://downloads.sourceforge.net/project/expat/expat/2.0.1/expat-2.0.1.tar.gz \
+    https://frama-c.com/download/frama-c-20.0-Calcium.tar.gz \
     /
 
-# Compile CppCheck from source
-RUN apt-get update \
+# Compile tools from source
+RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >> /etc/apt/sources.list \
+    && apt-get update \
     && apt-get install -y --no-install-recommends \
-        make=4.2.1-* \
-        g\+\+=4:8.3.0-* \
-        python3=3.7.3-* \
+        make=4.3-* \
+        g\+\+=4:10.1.0-* \
+        python3=3.8.2-* \
         libpcre3-dev=2:8.39-* \
-        unzip=6.0-23* \
+        unzip=6.0-* \
+        ocaml=4.08.1-* \
+        ocaml-findlib=1.8.1-* \
+        libfindlib-ocaml-dev=1.8.1-* \
+        libocamlgraph-ocaml-dev=1.8.8-* \
+        libyojson-ocaml-dev=1.7.0-* \
+        libzarith-ocaml-dev=1.9.1-* \
+        menhir=20200624-* \
     # Unzip sonar-scanner
     && unzip sonar-scanner-cli-4.4.0.2170.zip \
     && mv /sonar-scanner-4.4.0.2170 /sonar-scanner \
@@ -39,7 +48,13 @@ RUN apt-get update \
     && make \
     && make install \
     && ./rats \
-    && cd ..
+    && cd .. \
+    # Compile Frama-C
+    && tar -zxvf frama-c-20.0-Calcium.tar.gz \
+    && cd frama-c-20.0-Calcium \
+    && ./configure --disable-gui --disable-wp \
+    && make \
+    && make install
 
 ################################################################################
 
@@ -92,7 +107,7 @@ COPY --from=builder /usr/share/cppcheck /usr/share/cppcheck
 COPY --from=builder /usr/bin/cppcheck /usr/bin
 COPY --from=builder /usr/bin/cppcheck-htmlreport /usr/bin
 
-# Add RATS from builder stage
+# Add RATS and Frama-C from builder stage
 COPY --from=builder /usr/local /usr/local
 
 # Add CNES pylintrc A_B, C, D
@@ -112,6 +127,10 @@ RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >
             python3-pip=20.1.1-* \
             vera\+\+=1.2.1-* \
             shellcheck=0.7.1-* \
+            ocaml-findlib=1.8.1-* \
+            libocamlgraph-ocaml-dev=1.8.8-* \
+            libzarith-ocaml=1.9.1-* \
+            libyojson-ocaml=1.7.0-* \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /usr/local/man \
     # Install pylint and CNES pylint extension

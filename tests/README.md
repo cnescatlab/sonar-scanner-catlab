@@ -40,6 +40,18 @@ The `tests/` folder contains both test scripts and some dummy projects to analyz
 1. Import Vera++ results
     * file: import_vera_results.bash
     * purpose: Check that issues revealed by vera++ and activated in the Quality Profile can be imported in SonarQube.
+1. RATS
+    * file: rats.bash
+    * purpose: Check that RATS can be launched from within the container to analyze C/C++ projects.
+1. Import RATS results
+    * file: import_rats_results.bash
+    * purpose: Check that issues revealed by RATS and activated in the Quality Profile can be imported in SonarQube.
+1. Frama-C
+    * file: framac.bash
+    * purpose: Check that Frama-C can be launched from within the container to analyze C/C++ projects.
+1. Import Frama-C results
+    * file: import_framac_results.bash
+    * purpose: Check that issues revealed by Frama-C and activated in the Quality Profile can be imported in SonarQube.
 
 ### How to run all the tests
 
@@ -79,7 +91,7 @@ $ ./tests/run_tests.bash
       $ docker container logs -f lequalsonarqube
       Ctrl-C # once the container is ready
       ```
-* Run a test script with 
+* Run a test script with
     * ```sh
       $ ./tests/shell.bash
       # Environment variables may be modified

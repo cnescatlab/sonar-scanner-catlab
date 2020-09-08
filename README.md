@@ -6,15 +6,17 @@
 
 > Docker environment containing open source code analysis tools configured by CNES and dedicated to Continuous Integration.
 
-This image is a pre-configured sonar-scanner image derived from [Docker-CAT](https://github.com/cnescatlab/docker-cat). It contains the same tools for code analysis.
+This image is a pre-configured sonar-scanner image derived from [Docker-CAT](https://github.com/cnescatlab/docker-cat). It contains the same tools for code analysis and it is available on Docker Hub at [lequal/sonar-scanner](https://hub.docker.com/r/lequal/sonar-scanner/).
 
-SonarQube itself is an opensource project on GitHub : [SonarSource/sonarqube](https://github.com/SonarSource/sonarqube).
+SonarQube itself is an opensource project on GitHub: [SonarSource/sonarqube](https://github.com/SonarSource/sonarqube).
 
 For versions and changelog: [GitHub Releases](https://github.com/cnescatlab/sonar-scanner/releases).
 
+:information_source: If you only need a containerized `sonar-scanner`, you better use the official image from SonarSource available on Docker Hub: [sonarsource/sonar-scanner-cli](https://hub.docker.com/r/sonarsource/sonar-scanner-cli). The official image is smaller because it does not embed any other tool.
+
 ## Features
 
-This image is based on the official sonar-scanner image, namely [sonarsource/sonar-scanner-cli:4.4](https://hub.docker.com/r/sonarsource/sonar-scanner-cli), and offers additional features.
+Compared to the official [sonarsource/sonar-scanner-cli](https://hub.docker.com/r/sonarsource/sonar-scanner-cli) image, this image provides additional features.
 
 Additional features are:
 
@@ -26,10 +28,6 @@ Additional features are:
 _This image is made to be used in conjunction with a pre-configured SonarQube server image that embeds all necessary plugins and configuration: [cnescatlab/sonarqube](https://github.com/cnescatlab/sonarqube). It is, however, not mandatory to use it._
 
 ## User guide
-
-This image is available on Docker Hub: [lequal/sonar-scanner](https://hub.docker.com/r/lequal/sonar-scanner/).
-
-This image is based on the official SonarQube [sonar-scanner-cli docker image](https://hub.docker.com/r/sonarsource/sonar-scanner-cli) and suffer from the same limitations. Consequently, should you analyze .NET projects, use the SonarScanner for MSBuild.
 
 1. Write a `sonar-project.properties` at the root of your project
     * For information on what to write in it, see the [official SonarQube documentation](https://docs.sonarqube.org/7.9/analysis/analysis-parameters/)
@@ -49,6 +47,8 @@ This image is based on the official SonarQube [sonar-scanner-cli docker image](h
       # add the following option to the command line when running the lequal/sonar-scanner
       --net sonarbridge
       ```
+
+This image suffers from the same limitation as the official SonarQube [sonarsource/sonar-scanner-cli](https://hub.docker.com/r/sonarsource/sonar-scanner-cli) image. Consequently, should you analyze .NET projects, use the SonarScanner for MSBuild. Moreover, should you use a directory to save the scanner cache, create it before running a container. For more information, see [SonarQube documentation](https://docs.sonarqube.org/8.4/analysis/scan/sonarscanner/#header-6).
 
 ### How to use embedded tools
 
@@ -206,6 +206,7 @@ sonar-scanning:
 | [CppCheck](https://github.com/danmar/cppcheck)                                 | 1.90                 |
 | [Vera++](https://bitbucket.org/verateam/vera/wiki/Home)                        | 1.2.1                |
 | [RATS](https://code.google.com/archive/p/rough-auditing-tool-for-security/)    | 2.4                  |
+| [Frama-C](https://frama-c.com/index.html)                                      | 20.0                 |
 
 ## Developer's guide
 
