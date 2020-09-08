@@ -8,6 +8,8 @@
 
 ruleViolated="cppcheck:arrayIndexOutOfBounds"
 expected_sensor="INFO: Sensor C++ (Community) CppCheckSensor \[cxx\]"
-test_import_analysis_results "CppCheck" "CppCheck Dummy Project" "cppcheck-dummy-project" "CNES_C_A" "c++" "tests/c_cpp" "cppcheck" "$ruleViolated" "$expected_sensor"
+expected_import="INFO: CXX-CPPCHECK processed = 1"
+test_import_analysis_results "CppCheck" "CppCheck Dummy Project" "cppcheck-dummy-project" "CNES_C_A" "c++" \
+    "tests/c_cpp" "cppcheck" "$ruleViolated" "$expected_sensor" "$expected_import"
 
 exit $?

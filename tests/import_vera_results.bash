@@ -8,6 +8,8 @@
 
 ruleViolated="vera++:T008"
 expected_sensor="INFO: Sensor C++ (Community) VeraxxSensor \[cxx\]"
-test_import_analysis_results "Vera++" "Vera++ Dummy Project" "vera-dummy-project" "CNES_CPP_A" "c++" "tests/c_cpp" "vera" "$ruleViolated" "$expected_sensor"
+expected_import="INFO: CXX-VERA++ processed = 4"
+test_import_analysis_results "Vera++" "Vera++ Dummy Project" "vera-dummy-project" "CNES_CPP_A" "c++" \
+    "tests/c_cpp" "vera" "$ruleViolated" "$expected_sensor" "$expected_import"
 
 exit $?

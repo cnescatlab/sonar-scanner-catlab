@@ -300,12 +300,15 @@ test_analysis_tool()
 #   7: folder containing the source files (relative to the previous folder)
 #   8: id of a rule violated by a source file
 #   9: line of output of the sonar-scanner that tells the import sensor is used
-#   10: (optional) "yes" if if the rule violated needs to be activated in the Quality Profile for the import sensor to be run (default "no")
+#   10: line of output of the sonar-scanner that tells the result file was imported
+#   11: (optional) "yes" if if the rule violated needs to be activated in the Quality Profile for the import sensor to be run (default "no")
 #
 # Example:
 #   $ ruleViolated="cppcheck:arrayIndexOutOfBounds"
 #   $ expected_sensor="INFO: Sensor C++ (Community) CppCheckSensor \[cxx\]"
-#   $ test_import_analysis_results "CppCheck" "CppCheck Dummy Project" "cppcheck-dummy-project" "CNES_C_A" "c++" "tests/c_cpp" "cppcheck" "$ruleViolated" "$expected_sensor"
+#   $ expected_import="INFO: Processing report '/usr/src/tests/c_cpp/cppcheck-report.xml'"
+#   $ test_import_analysis_results "CppCheck" "CppCheck Dummy Project" "cppcheck-dummy-project" "CNES_C_A" "c++" \
+#       "tests/c_cpp" "cppcheck" "$ruleViolated" "$expected_sensor" "$expected_import"
 test_import_analysis_results()
 {
     # Args
@@ -318,6 +321,8 @@ test_import_analysis_results()
     sourceFolder=$7
     ruleViolated=$8
     expected_sensor=$9
+    shift
+    expected_import=$9
     activateRule="no"
     if [ $# -eq 10 ]
     then
@@ -372,11 +377,20 @@ test_import_analysis_results()
         return 1
     fi
 
-    # Analyse the project and collect the analysis files (that match the default name)
+    # Analyse the project and collect the analysis files (that match the default names)
+    usrSrcFolder="$PWD"
+    if [ "$projectKey" = "framac-dummy-project" ]
+    then
+        # Sonar Frama-C Plugin failed to find the result files when used with sonar.projectBaseDir
+        # Hence, we bind mount the project folder in /usr/src directly
+        # GitHub issue: https://github.com/cnescatlab/sonar-frama-c-plugin/issues/43
+        usrSrcFolder="$PWD/$languageFolder"
+        languageFolder=""
+    fi
     analysis_output=$(docker run --rm -u "$(id -u):$(id -g)" \
                                 -e SONAR_HOST_URL="$SONARQUBE_URL" \
                                 --net "$SONARQUBE_NETWORK" \
-                                -v "$PWD:/usr/src" \
+                                -v "$usrSrcFolder:/usr/src" \
                                 -v "$PWD/.sonarcache:/opt/sonar-scanner/.sonar/cache" \
                                 lequal/sonar-scanner \
                                     "-Dsonar.projectBaseDir=/usr/src/$languageFolder" \
@@ -384,18 +398,21 @@ test_import_analysis_results()
                                     "-Dsonar.projectName=$projectName" \
                                     "-Dsonar.projectVersion=1.0" \
                                     "-Dsonar.sources=$sourceFolder" \
+                                    "-Dsonar.python.pylint.reportPath=pylint-report.txt" \
                                         2>&1)
-    if ! echo -e "$analysis_output" | grep -q "$expected_sensor";
-    then
-        log "$ERROR" "Failed: the output of the scanner miss the line: $expected_sensor"
-        >&2 echo -e "$analysis_output"
-        return 1
-    else
-        echo -e "$analysis_output"
-    fi
+    for line in "$expected_sensor" "$expected_import"
+    do
+        if ! echo -e "$analysis_output" | grep -q "$line";
+        then
+            log "$ERROR" "Failed: the output of the scanner miss the line: $line"
+            >&2 echo -e "$analysis_output"
+            return 1
+        fi
+    done
+    echo -e "$analysis_output"
 
     # Wait for SonarQube to process the results
-    sleep 8
+    sleep 10
 
     # Check that the issue was added to the project
     nbIssues=$(curl -su "admin:$SONARQUBE_ADMIN_PASSWORD" \
