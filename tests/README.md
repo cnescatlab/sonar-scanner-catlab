@@ -52,6 +52,9 @@ The `tests/` folder contains both test scripts and some dummy projects to analyz
 1. Import Frama-C results
     * file: import_framac_results.bash
     * purpose: Check that issues revealed by Frama-C and activated in the Quality Profile can be imported in SonarQube.
+1. Infer
+    * file: infer.bash
+    * purpose: Check that Infer can be launched from within the container to analyze C/C++ projects.
 
 ### How to run all the tests
 

@@ -4,3 +4,5 @@
 
 # ignore results of tools
 tmp*results.*
+*.o
+infer-out/

@@ -207,6 +207,7 @@ sonar-scanning:
 | [Vera++](https://bitbucket.org/verateam/vera/wiki/Home)                        | 1.2.1                |
 | [RATS](https://code.google.com/archive/p/rough-auditing-tool-for-security/)    | 2.4                  |
 | [Frama-C](https://frama-c.com/index.html)                                      | 20.0                 |
+| [Infer](https://fbinfer.com/)                                                  | 0.17.0               |
 
 ## Developer's guide
 
