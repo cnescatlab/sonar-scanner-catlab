@@ -48,7 +48,10 @@ _This image is made to be used in conjunction with a pre-configured SonarQube se
       --net sonarbridge
       ```
 
-This image suffers from the same limitation as the official SonarQube [sonarsource/sonar-scanner-cli](https://hub.docker.com/r/sonarsource/sonar-scanner-cli) image. Consequently, should you analyze .NET projects, use the SonarScanner for MSBuild. Moreover, should you use a directory to save the scanner cache, create it before running a container. For more information, see [SonarQube documentation](https://docs.sonarqube.org/8.4/analysis/scan/sonarscanner/#header-6).
+This image suffers from the same limitations as the official SonarQube [sonarsource/sonar-scanner-cli](https://hub.docker.com/r/sonarsource/sonar-scanner-cli) image.
+
+* If you need to analyze .NET projects, you must use the SonarScanner for MSBuild.
+* If you want to save the sonar-scanner cache, you must create the directory to bind mount in the container before running it. For more information, see [SonarQube documentation](https://docs.sonarqube.org/8.4/analysis/scan/sonarscanner/#header-6).
 
 ### How to use embedded tools
 
