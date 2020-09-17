@@ -25,6 +25,36 @@ The `tests/` folder contains both test scripts and some dummy projects to analyz
 1. Import pylint results in SonarQube
     * file: import_pylint_results.bash
     * purpose: Check that issues revealed by a pylint analysis can be imported in SonarQube.
+1. C/C++
+    * file: c_cpp.bash
+    * purpose: Check that the C and C++ languages are supported and that CNES Quality Profiles are usable.
+1. CppCheck
+    * file: cppcheck.bash
+    * purpose: Check that cppcheck can be launched from within the container to analyze C/C++ projects.
+1. Import CppCheck results
+    * file: import_cppcheck_results.bash
+    * purpose: Check that issues revealed by a cppcheck analysis can be imported in SonarQube.
+1. Vera++
+    * file: vera.bash
+    * purpose: Check that vera++ can be launched from within the container to analyze C/C++ projects.
+1. Import Vera++ results
+    * file: import_vera_results.bash
+    * purpose: Check that issues revealed by vera++ and activated in the Quality Profile can be imported in SonarQube.
+1. RATS
+    * file: rats.bash
+    * purpose: Check that RATS can be launched from within the container to analyze C/C++ projects.
+1. Import RATS results
+    * file: import_rats_results.bash
+    * purpose: Check that issues revealed by RATS and activated in the Quality Profile can be imported in SonarQube.
+1. Frama-C
+    * file: framac.bash
+    * purpose: Check that Frama-C can be launched from within the container to analyze C/C++ projects.
+1. Import Frama-C results
+    * file: import_framac_results.bash
+    * purpose: Check that issues revealed by Frama-C and activated in the Quality Profile can be imported in SonarQube.
+1. Infer
+    * file: infer.bash
+    * purpose: Check that Infer can be launched from within the container to analyze C/C++ projects.
 
 ### How to run all the tests
 
@@ -50,7 +80,7 @@ $ ./tests/run_tests.bash
       ```
 1. Run a container of the SonarQube server
     * ```sh
-      docker run --name lequalsonarqube \
+      $ docker run --name lequalsonarqube \
               -d --rm \
               -p 9000:9000 \
               -e SONARQUBE_ADMIN_PASSWORD=adminpassword \
@@ -64,11 +94,11 @@ $ ./tests/run_tests.bash
       $ docker container logs -f lequalsonarqube
       Ctrl-C # once the container is ready
       ```
-* Run a test script with 
+* Run a test script with
     * ```sh
       $ ./tests/shell.bash
       # Environment variables may be modified
-      SONARQUBE_ADMIN_PASSWORD=pass ./tests/shell.bash
+      $ SONARQUBE_ADMIN_PASSWORD=pass ./tests/shell.bash
       ```
 * Test the exit status of the script with `echo $?`
     * zero => success

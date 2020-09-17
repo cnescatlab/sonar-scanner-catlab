@@ -6,15 +6,17 @@
 
 > Docker environment containing open source code analysis tools configured by CNES and dedicated to Continuous Integration.
 
-This image is a pre-configured sonar-scanner image derived from [Docker-CAT](https://github.com/cnescatlab/docker-cat). It contains the same tools for code analysis.
+This image is a pre-configured sonar-scanner image derived from [Docker-CAT](https://github.com/cnescatlab/docker-cat). It contains the same tools for code analysis and it is available on Docker Hub at [lequal/sonar-scanner](https://hub.docker.com/r/lequal/sonar-scanner/).
 
-SonarQube itself is an opensource project on GitHub : [SonarSource/sonarqube](https://github.com/SonarSource/sonarqube).
+SonarQube itself is an opensource project on GitHub: [SonarSource/sonarqube](https://github.com/SonarSource/sonarqube).
 
 For versions and changelog: [GitHub Releases](https://github.com/cnescatlab/sonar-scanner/releases).
 
+:information_source: If you only need a containerized `sonar-scanner`, you better use the official image from SonarSource available on Docker Hub: [sonarsource/sonar-scanner-cli](https://hub.docker.com/r/sonarsource/sonar-scanner-cli). The official image is smaller because it does not embed any other tool.
+
 ## Features
 
-This image is based on the official sonar-scanner image, namely [sonarsource/sonar-scanner-cli:4.4](https://hub.docker.com/r/sonarsource/sonar-scanner-cli), and offers additional features.
+Compared to the official [sonarsource/sonar-scanner-cli](https://hub.docker.com/r/sonarsource/sonar-scanner-cli) image, this image provides additional features.
 
 Additional features are:
 
@@ -26,10 +28,6 @@ Additional features are:
 _This image is made to be used in conjunction with a pre-configured SonarQube server image that embeds all necessary plugins and configuration: [cnescatlab/sonarqube](https://github.com/cnescatlab/sonarqube). It is, however, not mandatory to use it._
 
 ## User guide
-
-This image is available on Docker Hub: [lequal/sonar-scanner](https://hub.docker.com/r/lequal/sonar-scanner/).
-
-This image is based on the official SonarQube [sonar-scanner-cli docker image](https://hub.docker.com/r/sonarsource/sonar-scanner-cli) and suffer from the same limitations. Consequently, should you analyze .NET projects, use the SonarScanner for MSBuild.
 
 1. Write a `sonar-project.properties` at the root of your project
     * For information on what to write in it, see the [official SonarQube documentation](https://docs.sonarqube.org/7.9/analysis/analysis-parameters/)
@@ -49,6 +47,11 @@ This image is based on the official SonarQube [sonar-scanner-cli docker image](h
       # add the following option to the command line when running the lequal/sonar-scanner
       --net sonarbridge
       ```
+
+This image suffers from the same limitations as the official SonarQube [sonarsource/sonar-scanner-cli](https://hub.docker.com/r/sonarsource/sonar-scanner-cli) image.
+
+* If you need to analyze .NET projects, you must use the SonarScanner for MSBuild.
+* If you want to save the sonar-scanner cache, you must create the directory to bind mount in the container before running it. For more information, see [SonarQube documentation](https://docs.sonarqube.org/8.4/analysis/scan/sonarscanner/#header-6).
 
 ### How to use embedded tools
 
@@ -88,7 +91,7 @@ $ docker run \
 # where my-script.py is a python module in the current working directory
 ```
 
-To import pylint results in SonarQube see the [official documentation](https://docs.sonarqube.org/7.9/analysis/languages/python/#header-3). (Summed up: activate at least one pylint rule in the Quality Profile the project uses for Python and set `sonar.python.pylint.reportPath` in `sonar-project.properties`.)
+To import pylint results in SonarQube see the [official documentation](https://docs.sonarqube.org/7.9/analysis/languages/python/#header-3). (Summed up: Run pylint with the following template: `pylint <module_or_package> --rcfile=<pylintrc> -r n --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" > <report_file>`. Activate at least one pylint rule in the Quality Profile the project uses for Python and set `sonar.python.pylint.reportPath` in `sonar-project.properties`.)
 
 ### Examples usage in CI
 
@@ -200,9 +203,14 @@ sonar-scanning:
 | Tool                                                                           | Version              | 
 |--------------------------------------------------------------------------------|----------------------|
 | [sonar-scanner](https://docs.sonarqube.org/latest/analysis/scan/sonarscanner/) | 4.4.0.2170           |
-| [ShellCheck](https://github.com/koalaman/shellcheck)                           | 0.7.0                |
+| [ShellCheck](https://github.com/koalaman/shellcheck)                           | 0.7.1                |
 | [pylint](http://pylint.pycqa.org/en/latest/user_guide/index.html)              | 2.5.0                |
 | [CNES pylint extension](https://github.com/cnescatlab/cnes-pylint-extension)   | 5.0.0                |
+| [CppCheck](https://github.com/danmar/cppcheck)                                 | 1.90                 |
+| [Vera++](https://bitbucket.org/verateam/vera/wiki/Home)                        | 1.2.1                |
+| [RATS](https://code.google.com/archive/p/rough-auditing-tool-for-security/)    | 2.4                  |
+| [Frama-C](https://frama-c.com/index.html)                                      | 20.0                 |
+| [Infer](https://fbinfer.com/)                                                  | 0.17.0               |
 
 ## Developer's guide
 
