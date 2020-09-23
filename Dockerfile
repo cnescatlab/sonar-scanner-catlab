@@ -1,25 +1,19 @@
 # Builder image for analysis tools
 FROM debian:10.5-slim AS builder
 
-# Get sonar-scanner and C/C++ tools sources
-ADD https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.4.0.2170.zip \
-    https://downloads.sourceforge.net/project/cppcheck/cppcheck/1.90/cppcheck-1.90.tar.gz \
-    https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/rough-auditing-tool-for-security/rats-2.4.tgz \
-    http://downloads.sourceforge.net/project/expat/expat/2.0.1/expat-2.0.1.tar.gz \
-    https://frama-c.com/download/frama-c-20.0-Calcium.tar.gz \
-    https://github.com/facebook/infer/releases/download/v0.17.0/infer-linux64-v0.17.0.tar.xz \
-    /
-
-# Compile tools from source
+# Install tools from sources
 RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >> /etc/apt/sources.list \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
+        curl=7.72.0-* \
+        # for C/C++ tools
         make=4.3-* \
         g\+\+=4:10.1.0-* \
         python3=3.8.2-* \
         libpcre3-dev=2:8.39-* \
         unzip=6.0-* \
         xz-utils=5.2.4-* \
+        # for Frama-C
         ocaml=4.08.1-* \
         ocaml-findlib=1.8.1-* \
         libfindlib-ocaml-dev=1.8.1-* \
@@ -27,17 +21,21 @@ RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >
         libyojson-ocaml-dev=1.7.0-* \
         libzarith-ocaml-dev=1.9.1-* \
         menhir=20200624-* \
-    # Unzip sonar-scanner
+    # sonar-scanner
+    && curl -ksSLO https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.4.0.2170.zip \
     && unzip sonar-scanner-cli-4.4.0.2170.zip \
     && mv /sonar-scanner-4.4.0.2170 /sonar-scanner \
-    # Compile CppCheck
+    # CppCheck
+    && curl -ksSLO https://downloads.sourceforge.net/project/cppcheck/cppcheck/1.90/cppcheck-1.90.tar.gz \
     && tar -zxvf cppcheck-1.90.tar.gz \
     && make -C cppcheck-1.90/ install \
             MATCHCOMPILER="yes" \
             FILESDIR="/usr/share/cppcheck" \
             HAVE_RULES="yes" \
             CXXFLAGS="-O2 -DNDEBUG -Wall -Wno-sign-compare -Wno-unused-function -Wno-deprecated-declarations" \
-    # Compile RATS (and expat)
+    # RATS (and expat)
+    && curl -ksSLO https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/rough-auditing-tool-for-security/rats-2.4.tgz \
+    && curl -ksSLO http://downloads.sourceforge.net/project/expat/expat/2.0.1/expat-2.0.1.tar.gz \
     && tar -xvzf expat-2.0.1.tar.gz \
     && cd expat-2.0.1 \
     && ./configure \
@@ -51,14 +49,16 @@ RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >
     && make install \
     && ./rats \
     && cd .. \
-    # Compile Frama-C
+    # Frama-C
+    && curl -ksSLO https://frama-c.com/download/frama-c-20.0-Calcium.tar.gz \
     && tar -zxvf frama-c-20.0-Calcium.tar.gz \
     && cd frama-c-20.0-Calcium \
     && ./configure --disable-gui --disable-wp \
     && make \
     && make install \
     && cd .. \
-    # Decompress Infer
+    # Infer
+    && curl -ksSLO https://github.com/facebook/infer/releases/download/v0.17.0/infer-linux64-v0.17.0.tar.xz \
     && tar -C /opt -Jxvf infer-linux64-v0.17.0.tar.xz
 
 ################################################################################
@@ -178,7 +178,8 @@ RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >
 # Make sonar-scanner, CNES pylint and C/C++ tools executable
 ENV PYTHONPATH="$PYTHONPATH:/opt/python/cnes-pylint-extension-5.0.0/checkers" \
     PATH="$SONAR_SCANNER_HOME/bin:/usr/local/bin:$PATH" \
-    PYLINTHOME="$SONAR_SCANNER_HOME/.pylint.d"
+    PYLINTHOME="$SONAR_SCANNER_HOME/.pylint.d" \
+    JAVA_HOME="/usr/lib/jvm/java-11-openjdk-amd64"
 
 # Switch to an unpriviledged user
 USER sonar-scanner

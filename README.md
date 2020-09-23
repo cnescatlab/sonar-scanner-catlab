@@ -40,6 +40,7 @@ _This image is made to be used in conjunction with a pre-configured SonarQube se
             -v "$(pwd):/usr/src" \
             lequal/sonar-scanner
     ```
+    This docker command is equivalent to `sonar-scanner -Dsonar.host.url="url of your SonarQube instance"`.
     * If the SonarQube server is running in a container on the same computer, you will need to connect both containers (server and client) to the same bridge so that they can communicate. To do so:
       ```sh
       $ docker network create -d bridge sonarbridge
@@ -68,17 +69,17 @@ $ docker run \
 # where my-script.bash is a file in the current working directory
 ```
 
-For information on how to use these tools, refer to the official documentation of the tool.
+For information on how to use these tools, refer to their official documentation.
 
 #### How to use embedded CNES pylintrc
 
-There are 3 `pylintrc` embedded in the image under `/opt/python`:
+There are 3 _pylintrc_ embedded in the image under `/opt/python`:
 
 * `pylintrc_RNC_sonar_2017_A_B`
 * `pylintrc_RNC_sonar_2017_C`
 * `pylintrc_RNC_sonar_2017_D`
 
-To use one of these files when running pylint from within the container:
+To use one of these files when running `pylint` from within the container:
 
 ```sh
 # pylint with a CNES pylintrc
@@ -91,7 +92,27 @@ $ docker run \
 # where my-script.py is a python module in the current working directory
 ```
 
-To import pylint results in SonarQube see the [official documentation](https://docs.sonarqube.org/7.9/analysis/languages/python/#header-3). (Summed up: Run pylint with the following template: `pylint <module_or_package> --rcfile=<pylintrc> -r n --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" > <report_file>`. Activate at least one pylint rule in the Quality Profile the project uses for Python and set `sonar.python.pylint.reportPath` in `sonar-project.properties`.)
+To import pylint results in SonarQube see the [official documentation](https://docs.sonarqube.org/7.9/analysis/languages/python/#header-3). (Summed up: Run pylint with the following template: `pylint <module_or_package> --rcfile=<pylintrc> -r n --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" > pylint-report.txt`. Activate at least one pylint rule in the Quality Profile the project uses for Python.)
+
+#### How to use other pylintrcs
+
+You may want to use the embedded `pylint` with a pylintrc of yours . In this case, the easiest way to do so is to put a _pylintrc_ file along with the sources.
+
+To then use it:
+
+```sh
+# pylint with a custom pylintrc
+$ docker run \
+        --rm \
+        -u "$(id -u):$(id -g)" \
+        -v "$(pwd):/usr/src" \
+        lequal/sonar-scanner \
+        pylint --rcfile=/usr/src/custom_pylintrc my-script.py
+# where my-script.py is a python module in the current working directory
+# and custom_pylintrc is a pylintrc in the current working directory
+```
+
+On the other hand, if you want to use a CNES _pylintrc_ for your project you can download it directly from github. They are stored on this repository under [pylintrc.d](https://github.com/cnescatlab/sonar-scanner/tree/master/pylintrc.d).
 
 ### Examples usage in CI
 
@@ -101,33 +122,46 @@ _These examples still need to be tested._
 
 #### Jenkins
 
-Here is an example of a jenkins file that call this image to analyze a project.
+Here are 2 examples of a declarative Jenkinsfile and a scripted Jenkinsfile that call this image in a stage to analyze a project.
 
 ```groovy
+// Declarative pipeline
+def sonarqubeURL = 'https://my-sonarqube.com'
+
 pipeline {
     agent any
-    stages {
-        stage('Test') {
-            steps {
-                sh '''
-                    mkdir -p .sonarcache
-                    docker run --rm \
-                      -u "$(id -u):$(id -g)" \
-                      -e SONAR_HOST_URL="https://my-sonarqube.com" \
-                      -v "$(pwd):/usr/src" \
-                      -v ".sonarcache:/opt/sonar-scanner/.sonar/cache" \
-                      lequal/sonar-scanner
-                '''
 
-                cache {
-                  caches {
-                    path {
-                      '.sonarcache'
-                    }
-                  }
-                }
+    stages {
+        stage('Sonar scan') {
+            steps {
+                sh  """
+                    docker run --rm \
+                        -u "\$(id -u):\$(id -g)" \
+                        -e SONAR_HOST_URL="${sonarqubeURL}" \
+                        -v "\$(pwd):/usr/src" \
+                        lequal/sonar-scanner
+                    """
             }
         }
+    }
+}
+```
+
+```groovy
+// Scripted pipeline
+def sonarqubeURL = 'https://my-sonarqube.com'
+
+node {
+    checkout scm
+
+    stage('Sonar scan') {
+        sh  """
+            docker run --rm \
+                  -u "\$(id -u):\$(id -g)" \
+                  -e SONAR_HOST_URL="${sonarqubeURL}" \
+                  -v "\$(pwd):/usr/src" \
+                  lequal/sonar-scanner
+            """
     }
 }
 ```
@@ -200,17 +234,17 @@ sonar-scanning:
 
 ## Analysis tools included
 
-| Tool                                                                           | Version              | 
-|--------------------------------------------------------------------------------|----------------------|
-| [sonar-scanner](https://docs.sonarqube.org/latest/analysis/scan/sonarscanner/) | 4.4.0.2170           |
-| [ShellCheck](https://github.com/koalaman/shellcheck)                           | 0.7.1                |
-| [pylint](http://pylint.pycqa.org/en/latest/user_guide/index.html)              | 2.5.0                |
-| [CNES pylint extension](https://github.com/cnescatlab/cnes-pylint-extension)   | 5.0.0                |
-| [CppCheck](https://github.com/danmar/cppcheck)                                 | 1.90                 |
-| [Vera++](https://bitbucket.org/verateam/vera/wiki/Home)                        | 1.2.1                |
-| [RATS](https://code.google.com/archive/p/rough-auditing-tool-for-security/)    | 2.4                  |
-| [Frama-C](https://frama-c.com/index.html)                                      | 20.0                 |
-| [Infer](https://fbinfer.com/)                                                  | 0.17.0               |
+| Tool                                                                           | Version       | Default report file |
+|--------------------------------------------------------------------------------|---------------|---------------------|
+| [sonar-scanner](https://docs.sonarqube.org/latest/analysis/scan/sonarscanner/) | 4.4.0.2170    |                     |
+| [ShellCheck](https://github.com/koalaman/shellcheck)                           | 0.7.1         |                     |
+| [pylint](http://pylint.pycqa.org/en/latest/user_guide/index.html)              | 2.5.0         | pylint-report.txt   |
+| [CNES pylint extension](https://github.com/cnescatlab/cnes-pylint-extension)   | 5.0.0         |                     |
+| [CppCheck](https://github.com/danmar/cppcheck)                                 | 1.90          | cppcheck-report.xml |
+| [Vera++](https://bitbucket.org/verateam/vera/wiki/Home)                        | 1.2.1         | vera-report.xml     |
+| [RATS](https://code.google.com/archive/p/rough-auditing-tool-for-security/)    | 2.4           | rats-report.xml     |
+| [Frama-C](https://frama-c.com/index.html)                                      | 20.0          |                     |
+| [Infer](https://fbinfer.com/)                                                  | 0.17.0        |                     |
 
 ## Developer's guide
 

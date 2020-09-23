@@ -243,7 +243,7 @@ test_language()
 #   5: (optional) store the standard output in the temporary result file, either "yes" or "no" (default: "yes")
 #
 # Example:
-#   $ cmd="pylint -f json --rcfile=/opt/python/pylintrc_RNC_sonar_2017_A_B tests//src/*.py"
+#   $ cmd="pylint -f json --rcfile=/opt/python/pylintrc_RNC_sonar_2017_A_B tests/python/src/*.py"
 #   $ test_analysis_tool "pylint" "$cmd" "tests/python/reference-pylint-results.json" "tests/python/tmp-pylint-results.json"
 test_analysis_tool()
 {
@@ -306,7 +306,7 @@ test_analysis_tool()
 # Example:
 #   $ ruleViolated="cppcheck:arrayIndexOutOfBounds"
 #   $ expected_sensor="INFO: Sensor C++ (Community) CppCheckSensor \[cxx\]"
-#   $ expected_import="INFO: Processing report '/usr/src/tests/c_cpp/cppcheck-report.xml'"
+#   $ expected_import="INFO: CXX-CPPCHECK processed = 1"
 #   $ test_import_analysis_results "CppCheck" "CppCheck Dummy Project" "cppcheck-dummy-project" "CNES_C_A" "c++" \
 #       "tests/c_cpp" "cppcheck" "$ruleViolated" "$expected_sensor" "$expected_import"
 test_import_analysis_results()
@@ -378,27 +378,17 @@ test_import_analysis_results()
     fi
 
     # Analyse the project and collect the analysis files (that match the default names)
-    usrSrcFolder="$PWD"
-    if [ "$projectKey" = "framac-dummy-project" ]
-    then
-        # Sonar Frama-C Plugin failed to find the result files when used with sonar.projectBaseDir
-        # Hence, we bind mount the project folder in /usr/src directly
-        # GitHub issue: https://github.com/cnescatlab/sonar-frama-c-plugin/issues/43
-        usrSrcFolder="$PWD/$languageFolder"
-        languageFolder=""
-    fi
     analysis_output=$(docker run --rm -u "$(id -u):$(id -g)" \
                                 -e SONAR_HOST_URL="$SONARQUBE_URL" \
                                 --net "$SONARQUBE_NETWORK" \
-                                -v "$usrSrcFolder:/usr/src" \
+                                -v "$PWD:/usr/src" \
                                 -v "$PWD/.sonarcache:/opt/sonar-scanner/.sonar/cache" \
+                                -w "/usr/src/$languageFolder"\
                                 lequal/sonar-scanner \
-                                    "-Dsonar.projectBaseDir=/usr/src/$languageFolder" \
                                     "-Dsonar.projectKey=$projectKey" \
                                     "-Dsonar.projectName=$projectName" \
                                     "-Dsonar.projectVersion=1.0" \
                                     "-Dsonar.sources=$sourceFolder" \
-                                    "-Dsonar.python.pylint.reportPath=pylint-report.txt" \
                                         2>&1)
     for line in "$expected_sensor" "$expected_import"
     do
