@@ -69,7 +69,7 @@ $ docker run \
 # where my-script.bash is a file in the current working directory
 ```
 
-For information on how to use these tools, refer to their official documentations.
+For information on how to use these tools, refer to their official documentation.
 
 #### How to use embedded CNES pylintrc
 
@@ -111,6 +111,8 @@ $ docker run \
 # where my-script.py is a python module in the current working directory
 # and custom_pylintrc is a pylintrc in the current working directory
 ```
+
+On the other hand, if you want to use a CNES _pylintrc_ for your project you can download it directly from github. They are stored on this repository under [pylintrc.d](https://github.com/cnescatlab/sonar-scanner/tree/master/pylintrc.d).
 
 ### Examples usage in CI
 
