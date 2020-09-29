@@ -143,7 +143,7 @@ RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >
             # Needed by Frama-C
             ocaml-findlib=1.8.1-* \
             libocamlgraph-ocaml-dev=1.8.8-* \
-            libzarith-ocaml=1.9.1-* \
+            libzarith-ocaml=1.10-* \
             libyojson-ocaml=1.7.0-* \
             # Needed by Infer
             libsqlite3-0=3.33.0-* \
