@@ -1,79 +1,84 @@
 # Test documentation
 
-The `tests/` folder contains both test scripts and some dummy projects to analyze.
+The `tests/` folder contains both tests and some dummy projects to analyze.
 
-## List of scripted integration tests
+## List of integration tests
 
 1. Java
-    * file: java.bash
+    * function: test_language_java
     * purpose: Check that the Java language is supported and that the right plugins are executed.
 1. Shell
-    * file: shell.bash
+    * function: test_language_shell
     * purpose: Check that the Shell language is supported and that the right plugins are executed.
 1. ShellCheck
-    * file: shellcheck.bash
+    * function: test_tool_shellcheck
     * purpose: Check that ShellCheck can be launched from within the container to analyze scripts in the project.
 1. Fortran
-    * file: fortran.bash
+    * function: test_language_fortran
     * purpose: Check that the Fortran 77 and 90 languages are supported and that the right plugins are executed.
 1. Python
-    * file: python.bash
+    * function: test_language_python
     * purpose: Check that the Python language is supported and that CNES Quality Profiles are usable.
 1. Pylint
-    * file: pylint.bash
+    * function: test_tool_pylint
     * purpose: Check that Pylint can be launched from within the container to analyze Python projects.
 1. Import pylint results in SonarQube
-    * file: import_pylint_results.bash
+    * function: test_import_pylint_results
     * purpose: Check that issues revealed by a pylint analysis can be imported in SonarQube.
 1. C/C++
-    * file: c_cpp.bash
+    * function: test_language_c_cpp
     * purpose: Check that the C and C++ languages are supported and that CNES Quality Profiles are usable.
 1. CppCheck
-    * file: cppcheck.bash
+    * function: test_tool_cppcheck
     * purpose: Check that cppcheck can be launched from within the container to analyze C/C++ projects.
 1. Import CppCheck results
-    * file: import_cppcheck_results.bash
+    * function: test_import_cppcheck_results
     * purpose: Check that issues revealed by a cppcheck analysis can be imported in SonarQube.
 1. Vera++
-    * file: vera.bash
+    * function: test_tool_vera
     * purpose: Check that vera++ can be launched from within the container to analyze C/C++ projects.
 1. Import Vera++ results
-    * file: import_vera_results.bash
+    * function: test_import_vera_results
     * purpose: Check that issues revealed by vera++ and activated in the Quality Profile can be imported in SonarQube.
 1. RATS
-    * file: rats.bash
+    * function: test_tool_rats
     * purpose: Check that RATS can be launched from within the container to analyze C/C++ projects.
 1. Import RATS results
-    * file: import_rats_results.bash
+    * function: test_import_rats_results
     * purpose: Check that issues revealed by RATS and activated in the Quality Profile can be imported in SonarQube.
 1. Frama-C
-    * file: framac.bash
+    * function: test_tool_framac
     * purpose: Check that Frama-C can be launched from within the container to analyze C/C++ projects.
 1. Import Frama-C results
-    * file: import_framac_results.bash
+    * function: test_import_framac_results
     * purpose: Check that issues revealed by Frama-C and activated in the Quality Profile can be imported in SonarQube.
 1. Infer
-    * file: infer.bash
+    * function: test_tool_infer
     * purpose: Check that Infer can be launched from within the container to analyze C/C++ projects.
 
 ### How to run all the tests
 
 Before testing the image, it must be built (see the [README](https://github.com/cnescatlab/sonar-scanner#how-to-build-the-image)).
 
-To run the tests, the following tools are required:
-
-* `curl`
-* `jq`
-
-To run all the tests, use the test script like this:
+To run the tests, we use `pytest` with `Python 3.8` and the dependencies listed in _requirements.txt_. It is advised to use a virtual environment to run the tests.
 
 ```sh
-# from the root of the project
-$ ./tests/run_tests.bash
+# To run all the tests
+$ cd tests/
+$ pytest
+```
+
+```sh
+# One way to set up a virtual environment (optional)
+$ cd tests/
+$ virtualenv -p python3.8 env
+$ . env/bin/activate
+$ pip install -r requirements.txt
 ```
 
 ## How to run a specific test
 
+1. Activate the virtual environment (if any)
 1. Create a docker bridge
     * ```sh
       $ docker network create sonarbridge
@@ -94,41 +99,17 @@ $ ./tests/run_tests.bash
       $ docker container logs -f lequalsonarqube
       Ctrl-C # once the container is ready
       ```
-* Run a test script with
-    * ```sh
-      $ ./tests/shell.bash
-      # Environment variables may be modified
-      $ SONARQUBE_ADMIN_PASSWORD=pass ./tests/shell.bash
-      ```
-* Test the exit status of the script with `echo $?`
-    * zero => success
-    * non-zero => failure
+1. Run a specific test with `pytest` and specify some environment variables
+    ```sh
+    $ RUN=no SONARQUBE_ADMIN_PASSWORD="adminpassword" pytest -k "<name of the test>"
 
-## List of options and environment variables used by the tests
+## List of environment variables used by the tests
 
-Options:
-* `--no-server-run`: if this option is specified, the script will not run a `lequal/sonarqube` container or create a bridge network. It will only launch the tests. In this case, make sur to set necessary environment variables.
 
-Environment variables:
-* `SONARQUBE_CONTAINER_NAME`: the name to give to the container running the `lequal/sonarqube` image.
+* `RUN`: whether or not to run a lequal/sonarqube container and create a bridge network, default "yes", if you already have a running container, set it to "no" and provide information through the other variables.
+* `SONARQUBE_CONTAINER_NAME`: the name to give to the container running the lequal/sonarqube image.
 * `SONARQUBE_ADMIN_PASSWORD`: the password of the admin account on the server.
-* `SONARQUBE_URL`: URL of `lequal/sonarqube` container if already running without trailing `/` from the scanner container. e.g. http://mycontainer:9000 Use it only if no container name was given.
-* `SONARQUBE_LOCAL_URL`: URL of `lequal/sonarqube` container if already running without trailing `/` from the host. e.g. http://localhost:9000
-* `SONARQUBE_TAG`: the tag of the `lequal/sonarqube` image to use. e.g. latest
+* `SONARQUBE_URL`: URL of lequal/sonarqube container if already running without trailing / from the scanner container. e.g. http://mycontainer:9000 Use it only if no container name was given.
+* `SONARQUBE_LOCAL_URL`: URL of lequal/sonarqube container if already running without trailing / from the host. e.g. http://localhost:9000
+* `SONARQUBE_TAG`: the tag of the lequal/sonarqube image to use. e.g. latest
 * `SONARQUBE_NETWORK`: the name of the docker bridge used.
-
-## How to add a new test
-
-Tests are just scripts.
-
-To add a test:
-
-1. Create a file under the `tests/` folder
-1. Make it executable (with `chmod u+x tests/my_test.bash` for instance)
-1. Edit the script.
-1. To indicate whether the test has failed or succeed, use the exit status
-    * zero => success
-    * non-zero => failure
-1. Add the test to the [list](#list-of-scripted-integration-tests)
-
-Note that when using `./tests/run_tests.bash` to run the new test alongside the others, only messages on STDERR will by displayed if any.

@@ -8,7 +8,7 @@ RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >
         curl=7.72.0-* \
         # for C/C++ tools
         make=4.3-* \
-        g\+\+=4:10.1.0-* \
+        g\+\+=4:10.2.0-* \
         python3=3.8.2-* \
         libpcre3-dev=2:8.39-* \
         unzip=6.0-* \
@@ -150,8 +150,8 @@ RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >
             libtinfo5=6.2-* \
             python2.7=2.7.18-* \
             # Compilation tools needed by Infer
-            gcc=4:10.1.0-* \
-            g\+\+=4:10.1.0-* \
+            gcc=4:10.2.0-* \
+            g\+\+=4:10.2.0-* \
             clang=1:9.0-* \
             make=4.3-* \
     && rm -rf /var/lib/apt/lists/* \
