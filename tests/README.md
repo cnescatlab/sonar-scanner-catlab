@@ -14,7 +14,7 @@ The `tests/` folder contains both tests and some dummy projects to analyze.
     * function: test_tool_shellcheck
     * purpose: Check that ShellCheck can be launched from within the container to analyze scripts in the project.
 1. Fortran
-    * function: test_language_fortran
+    * functions: test_language_fortran_77 and test_language_fortran_90
     * purpose: Check that the Fortran 77 and 90 languages are supported and that the right plugins are executed.
 1. Python
     * function: test_language_python
@@ -60,7 +60,7 @@ The `tests/` folder contains both tests and some dummy projects to analyze.
 
 Before testing the image, it must be built (see the [README](https://github.com/cnescatlab/sonar-scanner#how-to-build-the-image)).
 
-To run the tests, we use `pytest` with `Python 3.8` and the dependencies listed in _requirements.txt_. It is advised to use a virtual environment to run the tests.
+To run the tests, we use [pytest](https://docs.pytest.org/en/stable/) with `Python 3.8` and the dependencies listed in _requirements.txt_. It is advised to use a virtual environment to run the tests.
 
 ```sh
 # To run all the tests

@@ -46,7 +46,7 @@ jobs:
   # Jobs that test the image and the embedded tools
   test:
     name: Test the Docker image
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     needs: build
     steps:
       - uses: actions/checkout@v2
@@ -83,8 +83,9 @@ jobs:
           docker build -t lequal/sonarqube:latest tmpserver/
           echo "Testing the scanner image..."
           echo -e "Results of the CI pipeline\n" > tests_logs.txt
-          pip install -r requirements.txt
-          cd tests/ && pytest -v |& tee -a ../tests_logs.txt
+          cd tests/
+          python3 -m pip install -r requirements.txt
+          python3 -m pytest -v |& tee -a ../tests_logs.txt
       # Publish test results in the pull request discussion
       - name: Comment the Pull Request
         if: github.event_name == 'pull_request'
@@ -95,4 +96,4 @@ jobs:
           path: tests_logs.txt
       # Have the job fail if at least one test failed
       - name: Check all tests passed
-        run: ! grep -q "FAILED" tests_logs.txt
+        run: grep -v -q "FAILED" tests_logs.txt

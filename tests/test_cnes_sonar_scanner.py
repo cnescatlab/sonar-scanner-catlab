@@ -66,7 +66,7 @@ class TestCNESSonarScanner:
         docker_client = docker.from_env()
         while b'[INFO] CNES SonarQube: ready!' not in docker_client.containers.get(container_name).logs(tail=tail):
             time.sleep(10)
-    
+
     @classmethod
     def language(cls, language_name: str, language_key: str, folder: str,
         sensors_info, project_key: str, nb_issues: int, cnes_qp: str = "",
