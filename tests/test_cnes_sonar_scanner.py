@@ -99,17 +99,39 @@ class TestCNESSonarScanner:
             self.language("Java", "java", "java", sensors, "java-dummy-project", 3, "CNES_JAVA_A", 6)
         """
         docker_client = docker.from_env()
-        print(f"Analysing project {project_key}...")
-        output = docker_client.containers.run(cls._SONAR_SCANNER_IMAGE, f"-Dsonar.projectBaseDir=/usr/src/tests/{folder}",
-            auto_remove=True,
-            environment={"SONAR_HOST_URL": cls.SONARQUBE_URL},
-            network=cls.SONARQUBE_NETWORK,
-            user=f"{os.getuid()}:{os.getgid()}",
-            volumes={
-                f"{cls._PROJECT_ROOT_DIR}": {'bind': '/usr/src', 'mode': 'rw'},
-                f"{cls._PROJECT_ROOT_DIR}/.sonarcache": {'bind': '/opt/sonar-scanner/.sonar/cache', 'mode': 'rw'}
-            }).decode("utf-8")
-        print(output)
+
+        # Inner functions to factor out some code
+        def analyse_project():
+            """
+            Factor out code analysis by the sonar-scanner
+
+            :returns: output of the analysis
+            """
+            print(f"Analysing project {project_key}...")
+            output = docker_client.containers.run(cls._SONAR_SCANNER_IMAGE, f"-Dsonar.projectBaseDir=/usr/src/tests/{folder}",
+                auto_remove=True,
+                environment={"SONAR_HOST_URL": cls.SONARQUBE_URL},
+                network=cls.SONARQUBE_NETWORK,
+                user=f"{os.getuid()}:{os.getgid()}",
+                volumes={
+                    f"{cls._PROJECT_ROOT_DIR}": {'bind': '/usr/src', 'mode': 'rw'},
+                    f"{cls._PROJECT_ROOT_DIR}/.sonarcache": {'bind': '/opt/sonar-scanner/.sonar/cache', 'mode': 'rw'}
+                }).decode("utf-8")
+            return output
+
+        def get_number_of_issues():
+            """
+            Factor out the resquest to get the number of issues of a project on SonarQube
+
+            :returns: the number of issues
+            """
+            output = requests.get(f"{cls.SONARQUBE_LOCAL_URL}/api/issues/search?componentKeys={project_key}",
+                        auth=("admin", cls.SONARQUBE_ADMIN_PASSWORD)).json()['issues']
+            issues = [ issue for issue in output if issue['status'] in ('OPEN', 'TO_REVIEW') ]
+            return len(issues)
+
+        # Analyse the project
+        output = analyse_project()
         # Make sure all non-default for this language plugins were executed by the scanner
         for sensor_line in sensors_info:
             # Hint: if this test fails, a plugin may not be installed correctly or a sensor is not triggered when needed
@@ -121,12 +143,8 @@ class TestCNESSonarScanner:
                         auth=("admin", cls.SONARQUBE_ADMIN_PASSWORD)).json()
         # Hint: if this test fails, the project is not on the server
         assert output['components'][0]['key'] == project_key
-        # Get the number of issues of the project
-        output = requests.get(f"{cls.SONARQUBE_LOCAL_URL}/api/issues/search?componentKeys={project_key}",
-                        auth=("admin", cls.SONARQUBE_ADMIN_PASSWORD)).json()['issues']
-        issues = [ issue for issue in output if issue['status'] in ('OPEN', 'TO_REVIEW') ]
         # Hint: if this test fails, there should be {nb_issues issues} on the {language_name} dummy project with the Sonar way QP but {len(issues)} were found
-        assert len(issues) == nb_issues
+        assert get_number_of_issues() == nb_issues
         print("Analysis with Sonar way QP ran as expected.")
         # If the language has a specific CNES Quality Profile, it must also be tested
         if cnes_qp:
@@ -139,15 +157,7 @@ class TestCNESSonarScanner:
                     "qualityProfile": cnes_qp
                 })
             # Rerun the analysis
-            docker_client.containers.run(cls._SONAR_SCANNER_IMAGE, f"-Dsonar.projectBaseDir=/usr/src/tests/{folder}",
-                auto_remove=True,
-                environment={"SONAR_HOST_URL": cls.SONARQUBE_URL},
-                network=cls.SONARQUBE_NETWORK,
-                user=f"{os.getuid()}:{os.getgid()}",
-                volumes={
-                    f"{cls._PROJECT_ROOT_DIR}": {'bind': '/usr/src', 'mode': 'rw'},
-                    f"{cls._PROJECT_ROOT_DIR}/.sonarcache": {'bind': '/opt/sonar-scanner/.sonar/cache', 'mode': 'rw'}
-                })
+            analyse_project()
             # Wait for SonarQube to process the results
             time.sleep(8)
             # Switch back to the Sonar way QP (in case the test needs to be rerun)
@@ -158,12 +168,8 @@ class TestCNESSonarScanner:
                     "project": project_key,
                     "qualityProfile": "Sonar way"
                 })
-            # Get the new number of issues
-            output = requests.get(f"{cls.SONARQUBE_LOCAL_URL}/api/issues/search?componentKeys={project_key}",
-                auth=("admin", cls.SONARQUBE_ADMIN_PASSWORD)).json()['issues']
-            issues = [ issue for issue in output if issue['status'] in ('OPEN', 'TO_REVIEW') ]
             # Hint: if this test fails, there should be {nb_issues_cnes_qp} issues on the {language_name} dummy project with the {cnes_qp} QP but {len(issues)} were found
-            assert len(issues) == nb_issues_cnes_qp
+            assert get_number_of_issues() == nb_issues_cnes_qp
 
     @classmethod
     def analysis_tool(cls, tool: str, cmd: str, ref_file: str, tmp_file: str, store_output: bool = True):
