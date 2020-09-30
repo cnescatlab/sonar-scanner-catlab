@@ -147,7 +147,7 @@ RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >
             libyojson-ocaml=1.7.0-* \
             # Needed by Infer
             libsqlite3-0=3.33.0-* \
-            libtinfo5=6.2-* \
+            libtinfo5=6.2* \
             python2.7=2.7.18-* \
             # Compilation tools needed by Infer
             gcc=4:10.2.0-* \

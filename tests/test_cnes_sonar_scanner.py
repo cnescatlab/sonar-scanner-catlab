@@ -329,7 +329,7 @@ class TestCNESSonarScanner:
             docker_client.containers.get(cls.SONARQUBE_CONTAINER_NAME).stop()
             print(f"Removing bridge network {cls.SONARQUBE_NETWORK}...")
             docker_client.networks.get(cls.SONARQUBE_NETWORK).remove()
-    
+
     # Language tests
     def test_language_c_cpp(self):
         """
