@@ -8,7 +8,7 @@ RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >
         curl=7.72.0-* \
         # for C/C++ tools
         make=4.3-* \
-        g\+\+=4:10.1.0-* \
+        ## not found##g\+\+=4:10.1.0-* \
         python3=3.8.2-* \
         libpcre3-dev=2:8.39-* \
         unzip=6.0-* \
@@ -19,12 +19,43 @@ RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >
         libfindlib-ocaml-dev=1.8.1-* \
         libocamlgraph-ocaml-dev=1.8.8-* \
         libyojson-ocaml-dev=1.7.0-* \
-        libzarith-ocaml-dev=1.9.1-* \
+        ##not found##libzarith-ocaml-dev=1.9.1-* \
         menhir=20200624-* \
+        #for yosys
+    && apt-get install -y build-essential clang bison flex \
+        libreadline-dev gawk tcl-dev libffi-dev git \
+        graphviz xdot pkg-config python3 libboost-system-dev \
+        libboost-python-dev libboost-filesystem-dev zlib1g-dev \
+    && git clone https://github.com/YosysHQ/yosys.git \
+    && cd yosys \
+    && make config-gcc \
+    && make \
+    && make install \
+    && cd .. \
+    #for ghdl
+    #FIXME:  this ghdl install procedure as to be updated to include gcov coverage
+    && apt-get install -y gnat git gcc make zlib1g-dev\ 
+    && git clone https://github.com/ghdl/ghdl.git \
+    && cd ghdl \
+    && ./configure --prefix=/usr/local \
+    && make \
+    && make install \
+    && cd .. \
+    #for  ghdl-yosys-plugin
+    && git clone https://github.com/ghdl/ghdl-yosys-plugin.git \
+    && cd ghdl-yosys-plugin \
+    && make \
+    && make install \
+    && cd .. \
     # sonar-scanner
     && curl -ksSLO https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.4.0.2170.zip \
     && unzip sonar-scanner-cli-4.4.0.2170.zip \
     && mv /sonar-scanner-4.4.0.2170 /sonar-scanner \
+    #Addon for RC scanner
+    && curl -ksSLO https://github.com/Linty-Services/VHDL-RC/releases/download/v3.1/rc-scanner-4.0.0.1744-1-linux.tar.gz \
+    && tar -zxvf rc-scanner-4.0.0.1744-1-linux.tar.gz \
+    && mkdir /sonar-scanner/rc \
+    && cp -r /rc-scanner-4.0.0.1744-1-linux/rc/* /sonar-scanner/rc/ \
     # CppCheck
     && curl -ksSLO https://downloads.sourceforge.net/project/cppcheck/cppcheck/1.90/cppcheck-1.90.tar.gz \
     && tar -zxvf cppcheck-1.90.tar.gz \
@@ -87,11 +118,13 @@ RUN addgroup sonar-scanner \
     && mkdir -p "$SONAR_SCANNER_HOME/bin" \
             "$SONAR_SCANNER_HOME/lib" \
             "$SONAR_SCANNER_HOME/conf" \
+            "$SONAR_SCANNER_HOME/rc" \
             "$SONAR_SCANNER_HOME/.sonar/cache" \
             "$SONAR_SCANNER_HOME/.pylint.d" \
     && chown -R sonar-scanner:sonar-scanner \
             "$SONAR_SCANNER_HOME" \
             "$SONAR_SCANNER_HOME/.sonar" \
+            "$SONAR_SCANNER_HOME/rc" \
             "$SONAR_SCANNER_HOME/.pylint.d" \
             "$SRC_DIR" \
     && chmod -R 777 \
@@ -106,6 +139,11 @@ COPY --from=builder /sonar-scanner/lib \
     "$SONAR_SCANNER_HOME/lib"
 # and our default sonar-scanner.properties
 COPY conf/sonar-scanner.properties "$SONAR_SCANNER_HOME/conf"
+#add VHDL RC engine
+COPY --from=builder /sonar-scanner/bin/rc/ \
+    "$SONAR_SCANNER_HOME/rc"
+#TODO add yosys from builder
+#TODO add ghdl from builder
 
 # Add CppCheck from builder stage
 COPY --from=builder /usr/share/cppcheck /usr/share/cppcheck
