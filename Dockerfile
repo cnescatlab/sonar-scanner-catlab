@@ -21,6 +21,8 @@ RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >
         libyojson-ocaml-dev=1.7.0-* \
         ##not found##libzarith-ocaml-dev=1.9.1-* \
         menhir=20200624-* \
+    #patch florent to be removed
+    && apt-get install -y libzarith-ocaml-dev g\+\+ \
         #for yosys
     && apt-get install -y build-essential clang bison flex \
         libreadline-dev gawk tcl-dev libffi-dev git \
@@ -140,10 +142,21 @@ COPY --from=builder /sonar-scanner/lib \
 # and our default sonar-scanner.properties
 COPY conf/sonar-scanner.properties "$SONAR_SCANNER_HOME/conf"
 #add VHDL RC engine
-COPY --from=builder /sonar-scanner/bin/rc/ \
+COPY --from=builder /sonar-scanner/rc/ \
     "$SONAR_SCANNER_HOME/rc"
 #TODO add yosys from builder
+COPY --from=builder /usr/local/bin/yosys /usr/local/bin/yosys
+COPY --from=builder /usr/local/bin/yosys-abc /usr/local/bin/yosys-abc
+COPY --from=builder /usr/local/bin/yosys-config /usr/local/bin/yosys-config
+COPY --from=builder /usr/local/bin/yosys-filterlib /usr/local/bin/yosys-filterlib
+COPY --from=builder /usr/local/bin/yosys-smtbmc /usr/local/bin/yosys-smtbmc
 #TODO add ghdl from builder
+COPY --from=builder /usr/local/lib/libghdl.a /usr/local/lib/libghdl.a 
+COPY --from=builder /usr/local/lib/libghdl.link /usr/local/lib/libghdl.link 
+COPY --from=builder /usr/local/lib/libghdl-1_0_dev.so /usr/local/lib/libghdl-1_0_dev.so 
+COPY --from=builder /usr/local/lib/libghdlvpi.so /usr/local/lib/libghdlvpi.so 
+COPY --from=builder /usr/local/lib/ghdl /usr/local/lib/ghdl
+COPY --from=builder /usr/local/bin/ghdl /usr/local/bin/ghdl 
 
 # Add CppCheck from builder stage
 COPY --from=builder /usr/share/cppcheck /usr/share/cppcheck
@@ -181,17 +194,18 @@ RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >
             # Needed by Frama-C
             ocaml-findlib=1.8.1-* \
             libocamlgraph-ocaml-dev=1.8.8-* \
-            libzarith-ocaml=1.9.1-* \
+            #libzarith-ocaml=1.9.1-* \
             libyojson-ocaml=1.7.0-* \
             # Needed by Infer
             libsqlite3-0=3.33.0-* \
-            libtinfo5=6.2-* \
+            #libtinfo5=6.2-* \
             python2.7=2.7.18-* \
             # Compilation tools needed by Infer
-            gcc=4:10.1.0-* \
-            g\+\+=4:10.1.0-* \
+            #gcc=4:10.1.0-* \
+            ##g\+\+=4:10.1.0-* \
             clang=1:9.0-* \
             make=4.3-* \
+    && apt-get install -y libzarith-ocaml libtinfo5 gcc  g\+\+\
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /usr/local/man \
     # Install pylint and CNES pylint extension
