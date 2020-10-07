@@ -145,18 +145,16 @@ COPY conf/sonar-scanner.properties "$SONAR_SCANNER_HOME/conf"
 #add VHDL RC engine
 COPY --from=builder /sonar-scanner/rc/ \
     "$SONAR_SCANNER_HOME/rc"
-#give ownership to user (for write and execution)
+#give ownership to user (for write and execution) for VHDL RC engine
 RUN chown -R sonar-scanner:sonar-scanner "$SONAR_SCANNER_HOME/rc"
 RUN chmod -R 777 "$SONAR_SCANNER_HOME/rc" 
-
-
-#TODO add yosys from builder
+# add yosys from builder
 COPY --from=builder /usr/local/bin/yosys /usr/local/bin/yosys
 COPY --from=builder /usr/local/bin/yosys-abc /usr/local/bin/yosys-abc
 COPY --from=builder /usr/local/bin/yosys-config /usr/local/bin/yosys-config
 COPY --from=builder /usr/local/bin/yosys-filterlib /usr/local/bin/yosys-filterlib
 COPY --from=builder /usr/local/bin/yosys-smtbmc /usr/local/bin/yosys-smtbmc
-#TODO add ghdl from builder
+# add ghdl from builder
 COPY --from=builder /usr/local/lib/libghdl.a /usr/local/lib/libghdl.a 
 COPY --from=builder /usr/local/lib/libghdl.link /usr/local/lib/libghdl.link 
 COPY --from=builder /usr/local/lib/libghdl-1_0_dev.so /usr/local/lib/libghdl-1_0_dev.so 
@@ -211,6 +209,7 @@ RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >
             ##g\+\+=4:10.1.0-* \
             clang=1:9.0-* \
             make=4.3-* \
+    ##patch for problem with previous too old version
     && apt-get install -y libzarith-ocaml libtinfo5 gcc  g\+\+\
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /usr/local/man \
@@ -237,7 +236,7 @@ RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >
 ENV PYTHONPATH="$PYTHONPATH:/opt/python/cnes-pylint-extension-5.0.0/checkers" \
     PATH="$SONAR_SCANNER_HOME/bin:/usr/local/bin:$PATH" \
     PYLINTHOME="$SONAR_SCANNER_HOME/.pylint.d" \
-    JAVA_HOME="/usr/lib/jvm/java-11-openjdk-amd64"
+    JAVA_HOME="/usr/lib/jvm/java-11-openjdk-amd64" 
 
 # Switch to an unpriviledged user
 USER sonar-scanner
@@ -246,3 +245,5 @@ USER sonar-scanner
 COPY --chown=sonar-scanner:sonar-scanner scripts/entrypoint.sh /usr/bin
 ENTRYPOINT [ "/usr/bin/entrypoint.sh" ]
 CMD [ "sonar-scanner" ]
+#CMD [ "cat /opt/sonar-scanner/rc/App/eclipse/configuration/*.log"]
+
