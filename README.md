@@ -48,6 +48,15 @@ _This image is made to be used in conjunction with a pre-configured SonarQube se
       # add the following option to the command line when running the lequal/sonar-scanner
       --net sonarbridge
       ```
+    * To find you server IP you can eexecute the following commands:   
+      Get the sonarqube server Container ID by running:
+      ```sh
+      docker ps
+      ```
+      Use this Container ID to get the dedicated IP address:
+      ```sh
+      docker inspect -f '{{range .NetworkSettings.Networks}} {{.IPAddress}}{{end}}' <MySonarqubeDockerID>
+       ```
 
 This image suffers from the same limitations as the official SonarQube [sonarsource/sonar-scanner-cli](https://hub.docker.com/r/sonarsource/sonar-scanner-cli) image.
 
@@ -245,6 +254,8 @@ sonar-scanning:
 | [RATS](https://code.google.com/archive/p/rough-auditing-tool-for-security/)    | 2.4           | rats-report.xml     |
 | [Frama-C](https://frama-c.com/index.html)                                      | 20.0          |                     |
 | [Infer](https://fbinfer.com/)                                                  | 0.17.0        |                     |
+| [VHDLRC](https://github.com/VHDLTool/sonar-VHDLRC)                             | 1.8.043       |                     |
+
 
 ## Developer's guide
 
@@ -262,6 +273,12 @@ $ docker build -t lequal/sonar-scanner .
 To then run a container with this image see the [user guide](#user-guide).
 
 To run the tests and create your own ones see the [test documentation](https://github.com/cnescatlab/sonar-scanner/tree/develop/tests).
+
+### Debugging the image
+If analysis doesn't perform correctly you can inspect the image by loggin into it running:
+```sh
+docker run -it lequal/sonar-scanner sh 
+```
 
 ## How to contribute
 

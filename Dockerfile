@@ -131,6 +131,7 @@ RUN addgroup sonar-scanner \
             "$SRC_DIR" \
     && chmod -R 777 \
             "$SONAR_SCANNER_HOME/.sonar" \
+            "$SONAR_SCANNER_HOME/rc" \
             "$SONAR_SCANNER_HOME/.pylint.d" \
             "$SRC_DIR"
 
@@ -144,6 +145,11 @@ COPY conf/sonar-scanner.properties "$SONAR_SCANNER_HOME/conf"
 #add VHDL RC engine
 COPY --from=builder /sonar-scanner/rc/ \
     "$SONAR_SCANNER_HOME/rc"
+#give ownership to user (for write and execution)
+RUN chown -R sonar-scanner:sonar-scanner "$SONAR_SCANNER_HOME/rc"
+RUN chmod -R 777 "$SONAR_SCANNER_HOME/rc" 
+
+
 #TODO add yosys from builder
 COPY --from=builder /usr/local/bin/yosys /usr/local/bin/yosys
 COPY --from=builder /usr/local/bin/yosys-abc /usr/local/bin/yosys-abc
