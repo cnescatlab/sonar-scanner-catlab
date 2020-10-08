@@ -275,11 +275,26 @@ To then run a container with this image see the [user guide](#user-guide).
 To run the tests and create your own ones see the [test documentation](https://github.com/cnescatlab/sonar-scanner/tree/develop/tests).
 
 ### Debugging the image
-If analysis doesn't perform correctly you can inspect the image by loggin into it running:
+If analysis doesn't perform correctly you can inspect the image by doing the following sequence:
+1. launch the container with a shell (the entrypoint script is not ran).   
+In this case, a bridge was created as sonarbridge to link with the soanrqube container which can be address with IP 172.18.0.2. Notice that the container was given a name : lequalscanner.
 ```sh
-docker run -it lequal/sonar-scanner sh 
-```
+docker run --name lequalscanner --net sonarbridge --rm  -e SONAR_HOST_URL="http://172.18.0.2:9000" -it lequal/sonar-scanner sh 
 
+```
+2. Run the following script (on a new windows powershell)
+```sh
+#get container ID and store it in a variable
+$DOCKERID=docker ps -aqf "name=lequalscanner"  
+#copy your sources in the scanner container (you're supposed to be located in your sources directory when executing this script)
+docker cp .  ${DOCKERID}:/usr/src
+#change ownership of the sources
+docker exec -u root  ${DOCKERID} bash -c 'chown -R sonar-scanner:sonar-scanner /usr/src'
+```
+3. Do what ever you needed to be done. You can launch sonar scanner analysis by running the following command in the container shell and then debug the result
+```sh
+entrypoint.sh -X.
+```
 ## How to contribute
 
 If you experienced a problem with the image please open an issue. Inside this issue please explain us how to reproduce this issue and paste the log. 

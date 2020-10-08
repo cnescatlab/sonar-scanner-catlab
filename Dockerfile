@@ -211,6 +211,8 @@ RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >
             make=4.3-* \
     ##patch for problem with previous too old version
     && apt-get install -y libzarith-ocaml libtinfo5 gcc  g\+\+\
+    ##x needed for elipse
+    && apt-get install -y xvfb libswt-gtk-4-jni libswt-gtk-4-java\
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /usr/local/man \
     # Install pylint and CNES pylint extension
@@ -230,20 +232,22 @@ RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >
             astroid==2.4.0 \
             pylint==2.5.0 \
     # Infer
-    && ln -s "/opt/infer-linux64-v0.17.0/bin/infer" /usr/local/bin/infer
+    && ln -s "/opt/infer-linux64-v0.17.0/bin/infer" /usr/local/bin/infer 
+
 
 # Make sonar-scanner, CNES pylint and C/C++ tools executable
 ENV PYTHONPATH="$PYTHONPATH:/opt/python/cnes-pylint-extension-5.0.0/checkers" \
     PATH="$SONAR_SCANNER_HOME/bin:/usr/local/bin:$PATH" \
     PYLINTHOME="$SONAR_SCANNER_HOME/.pylint.d" \
-    JAVA_HOME="/usr/lib/jvm/java-11-openjdk-amd64" 
+    JAVA_HOME="/usr/lib/jvm/java-11-openjdk-amd64" \
+    DISPLAY=":0"
 
 # Switch to an unpriviledged user
 USER sonar-scanner
-
-# Set the entrypoint (a SonarSource script) and the default command (sonar-scanner)
+#add fake screen kickstart . this fake screen is needed by eclipse
+COPY --chown=sonar-scanner:sonar-scanner scripts/kickstartfakedisplay.sh /usr/bin
+# copy the entrypoint (a SonarSource script) and the default command (sonar-scanner)
 COPY --chown=sonar-scanner:sonar-scanner scripts/entrypoint.sh /usr/bin
-ENTRYPOINT [ "/usr/bin/entrypoint.sh" ]
+# Set the entrypoint
+ENTRYPOINT [ "/usr/bin/kickstartfakedisplay.sh" ]
 CMD [ "sonar-scanner" ]
-#CMD [ "cat /opt/sonar-scanner/rc/App/eclipse/configuration/*.log"]
-
