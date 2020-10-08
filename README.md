@@ -279,7 +279,7 @@ If analysis doesn't perform correctly you can inspect the image by doing the fol
 1. launch the container with a shell (the entrypoint script is not ran).   
 In this case, a bridge was created as sonarbridge to link with the soanrqube container which can be address with IP 172.18.0.2. Notice that the container was given a name : lequalscanner.
 ```sh
-docker run --name lequalscanner --net sonarbridge --rm  -e SONAR_HOST_URL="http://172.18.0.2:9000" -it lequal/sonar-scanner sh 
+docker run --name lequalscanner --net sonarbridge --rm  -e SONAR_HOST_URL="http://172.18.0.2:9000" -it --entrypoint /bin/sh lequal/sonar-scanner  
 
 ```
 2. Run the following script (on a new windows powershell)
