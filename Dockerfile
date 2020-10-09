@@ -213,6 +213,8 @@ RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >
     && apt-get install -y libzarith-ocaml libtinfo5 gcc  g\+\+\
     ##x needed for elipse
     && apt-get install -y xvfb libswt-gtk-4-jni libswt-gtk-4-java\
+    ## needed for ghdl
+    && apt-get install -y gnat\ 
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /usr/local/man \
     # Install pylint and CNES pylint extension
