@@ -4,7 +4,7 @@ FROM debian:10.5-slim AS builder
 # Install tools from sources
 RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >> /etc/apt/sources.list \
     && apt-get update \
-    && apt-get install -y --no-install-recommends \
+    && apt-get install -o APT::Immediate-Configure=false -y --no-install-recommends \
         curl=7.72.0-* \
         # for C/C++ tools
         make=4.3-* \
