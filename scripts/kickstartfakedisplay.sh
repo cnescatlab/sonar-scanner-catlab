@@ -3,4 +3,4 @@
 #run fake display
 Xvfb :0 &
 #run sonarscanner entry file
-/usr/bin/entrypoint.sh
+/usr/bin/entrypoint.sh "$@" 
