@@ -185,7 +185,7 @@ ADD https://github.com/cnescatlab/cnes-pylint-extension/archive/v5.0.0.tar.gz \
 RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >> /etc/apt/sources.list \
     && apt-get update \
     && mkdir -p /usr/share/man/man1 \
-    && apt-get install -y --no-install-recommends \
+    && apt-get install -o APT::Immediate-Configure=false -y --no-install-recommends \
             # Needed by sonar-scanner
             openjdk-11-jre-headless=11.0.8* \
             # Needed by Pylint
