@@ -38,14 +38,14 @@ _This image is made to be used in conjunction with a pre-configured SonarQube se
             -u "$(id -u):$(id -g)" \
             -e SONAR_HOST_URL="url of your SonarQube instance" \
             -v "$(pwd):/usr/src" \
-            lequal/sonar-scanner
+            lequal/sonar-scanner-vhdl
     ```
     This docker command is equivalent to `sonar-scanner -Dsonar.host.url="url of your SonarQube instance"`.
     * If the SonarQube server is running in a container on the same computer, you will need to connect both containers (server and client) to the same bridge so that they can communicate. To do so:
       ```sh
       $ docker network create -d bridge sonarbridge
       $ docker network connect sonarbridge "name of your sonarqube container"
-      # add the following option to the command line when running the lequal/sonar-scanner
+      # add the following option to the command line when running the lequal/sonar-scanner-vhdl
       --net sonarbridge
       ```
     * To find you server IP you can eexecute the following commands:   
@@ -73,7 +73,7 @@ $ docker run \
         --rm \
         -u "$(id -u):$(id -g)" \
         -v "$(pwd):/usr/src" \
-        lequal/sonar-scanner \
+        lequal/sonar-scanner-vhdl \
         shellcheck --color always -s bash -f checkstyle my-script.bash
 # where my-script.bash is a file in the current working directory
 ```
@@ -96,7 +96,7 @@ $ docker run \
         --rm \
         -u "$(id -u):$(id -g)" \
         -v "$(pwd):/usr/src" \
-        lequal/sonar-scanner \
+        lequal/sonar-scanner-vhdl \
         pylint --rcfile=/opt/python/pylintrc_RNC_sonar_2017_A_B my-script.py
 # where my-script.py is a python module in the current working directory
 ```
@@ -115,7 +115,7 @@ $ docker run \
         --rm \
         -u "$(id -u):$(id -g)" \
         -v "$(pwd):/usr/src" \
-        lequal/sonar-scanner \
+        lequal/sonar-scanner-vhdl \
         pylint --rcfile=/usr/src/custom_pylintrc my-script.py
 # where my-script.py is a python module in the current working directory
 # and custom_pylintrc is a pylintrc in the current working directory
@@ -148,7 +148,7 @@ pipeline {
                         -u "\$(id -u):\$(id -g)" \
                         -e SONAR_HOST_URL="${sonarqubeURL}" \
                         -v "\$(pwd):/usr/src" \
-                        lequal/sonar-scanner
+                        lequal/sonar-scanner-vhdl
                     """
             }
         }
@@ -169,7 +169,7 @@ node {
                   -u "\$(id -u):\$(id -g)" \
                   -e SONAR_HOST_URL="${sonarqubeURL}" \
                   -v "\$(pwd):/usr/src" \
-                  lequal/sonar-scanner
+                  lequal/sonar-scanner-vhdl
             """
     }
 }
@@ -198,7 +198,7 @@ jobs:
                     -e SONAR_HOST_URL="https://my-sonarqube.com" \
                     -v "$(pwd):/usr/src" \
                     -v ".sonarcache:/opt/sonar-scanner/.sonar/cache" \
-                    lequal/sonar-scanner
+                    lequal/sonar-scanner-vhdl
 ```
 
 #### Travis CI
@@ -217,7 +217,7 @@ script:
         -e SONAR_HOST_URL="https://my-sonarqube.com" \
         -v "$(pwd):/usr/src" \
         -v "/home/travis/.sonarcache:/opt/sonar-scanner/.sonar/cache" \
-        lequal/sonar-scanner
+        lequal/sonar-scanner-vhdl
 ```
 
 #### GitLab-CI
@@ -238,7 +238,7 @@ sonar-scanning:
               -e SONAR_HOST_URL="https://my-sonarqube.com" \
               -v "$(pwd):/usr/src" \
               -v ".sonarcache:/opt/sonar-scanner/.sonar/cache" \
-              lequal/sonar-scanner
+              lequal/sonar-scanner-vhdl
 ```
 
 ## Analysis tools included
@@ -267,7 +267,7 @@ It is a normal docker image. Thus, it can be built with the following commands.
 
 ```sh
 # from the root of the project
-$ docker build -t lequal/sonar-scanner .
+$ docker build -t lequal/sonar-scanner-vhdl .
 ```
 
 To then run a container with this image see the [user guide](#user-guide).
