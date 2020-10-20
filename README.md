@@ -1,8 +1,8 @@
 # CNES sonar-scanner image \[client\]
 
-![](https://github.com/cnescatlab/sonar-scanner/workflows/CI/badge.svg)
-![](https://github.com/cnescatlab/sonar-scanner/workflows/CD/badge.svg)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/f5f71dea84ce4020ab15a99fc841a696)](https://www.codacy.com/gh/cnescatlab/sonar-scanner?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=lequal/sonar-scanner&amp;utm_campaign=Badge_Grade)
+![](https://github.com/VHDLTool/Docker-sonar-scanner-vhdl/workflows/CI/badge.svg)
+![](https://github.com/VHDLTool/Docker-sonar-scanner-vhdl/workflows/CD/badge.svg)
+
 
 > Docker environment containing open source code analysis tools configured by CNES and dedicated to Continuous Integration.
 
