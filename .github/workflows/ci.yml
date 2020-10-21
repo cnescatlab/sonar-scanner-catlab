@@ -19,8 +19,12 @@ on:
     branches:
       - '*'
     paths-ignore:
-      - '*.md'
-
+      - '*.md' 
+  workflow_dispatch:
+    branches:
+      - '*'
+    paths-ignore:
+      - '*.md' 
 # Variables to configure the workflow
 env:
   DOCKERFILE_PATH: '.'
