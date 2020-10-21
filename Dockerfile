@@ -31,7 +31,7 @@ RUN git clone https://github.com/ghdl/ghdl-yosys-plugin.git \
     && make install \
     && cd .. 
     # sonar-scanner
-RUN apt-get install -y curl \
+RUN apt-get install -y curl unzip\
     && curl -ksSLO https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.4.0.2170.zip \
     && unzip sonar-scanner-cli-4.4.0.2170.zip \
     && mv /sonar-scanner-4.4.0.2170 /sonar-scanner 
@@ -111,14 +111,14 @@ COPY --from=builder /usr/local/bin/ghdl /usr/local/bin/ghdl
 
 # Install tools
 RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >> /etc/apt/sources.list \
-    && apt-get update \
-    && mkdir -p /usr/share/man/man1 \
+    && apt-get update 
+RUN mkdir -p /usr/share/man/man1 
     ##x needed for eclipse
-    && apt-get install -y xvfb libswt-gtk-4-jni libswt-gtk-4-java\
+RUN apt-get install -o APT::Immediate-Configure=false -y xvfb libswt-gtk-4-jni libswt-gtk-4-java openjdk-11-jre
     ## needed for ghdl
-    && apt-get install -y gnat\ 
+RUN apt-get install -o APT::Immediate-Configure=false -y gnat
     ## clean apt
-    && rm -rf /var/lib/apt/lists/* \
+RUN rm -rf /var/lib/apt/lists/* \
     && rm -rf /usr/local/man 
 
 # Make sonar-scanner executable

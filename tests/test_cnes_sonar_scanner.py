@@ -337,6 +337,19 @@ class TestCNESSonarScanner:
             docker_client.networks.get(cls.SONARQUBE_NETWORK).remove()
 
     # Language tests
+    def test_language_vhdl(self):
+        """
+        As a user of this image, I want to analyze a vhdl project
+        so that I can see its level of quality on the SonarQube server.
+        """
+        #FIXME : needed to have a new configuration to test modelsim cov plugin
+        sensors = (
+            "INFO: Sensor vhdlRcSensor [vhdlrc]",
+            "INFO: Sensor VhdlRcMetricSensor [vhdlrc]",
+            "INFO: Sensor GcovSensor [gcov]",
+        )
+        self.language("VHDL", "VHDL", "vhdl", sensors, "demo_project_plasma", 99)
+
     def test_language_c_cpp(self):
         """
         As a user of this image, I want to analyze a C/C++ project
