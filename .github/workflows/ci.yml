@@ -78,10 +78,12 @@ jobs:
             branch=${{ github.head_ref }}
           fi
           echo "Cloning the server repo on branch $branch..."
-          if ! git clone https://github.com/cnescatlab/sonarqube.git -b "$branch" tmpserver;
+          # if ! git clone https://github.com/cnescatlab/sonarqube.git -b "$branch" tmpserver;
+            if ! git clone https://github.com/VHDLTool/Docker-sonar-sonarqube.git -b "$branch" tmpserver;
           then
             echo "No branch $branch found on the server repository, using develop"
-            git clone https://github.com/cnescatlab/sonarqube.git -b develop tmpserver
+            #git clone https://github.com/cnescatlab/sonarqube.git -b develop tmpserver
+            git clone https://github.com/VHDLTool/Docker-sonar-sonarqube.git -b develop tmpserver
           fi
           echo "Building the server image..."
           docker build -t lequal/sonarqube:latest tmpserver/
