@@ -3,9 +3,9 @@ FROM debian:10.5-slim AS builder
 
 # Install tools from sources
 RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >> /etc/apt/sources.list \
-    && apt-get update \
+    && apt-get update
     #for yosys
-    && apt-get install -o APT::Immediate-Configure=false -y build-essential clang bison flex \
+RUN apt-get install -o APT::Immediate-Configure=false -y build-essential clang bison flex \
         libreadline-dev gawk tcl-dev libffi-dev git \
         graphviz xdot pkg-config python3 libboost-system-dev \
         libboost-python-dev libboost-filesystem-dev zlib1g-dev \
@@ -14,28 +14,29 @@ RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >
     && make config-gcc \
     && make \
     && make install \
-    && cd .. \
+    && cd .. 
     #for ghdl
     #FIXME:  this ghdl install procedure as to be updated to include gcov coverage
-    && apt-get install -o APT::Immediate-Configure=false  -y gnat git gcc make zlib1g-dev\ 
+ RUN apt-get install -o APT::Immediate-Configure=false  -y gnat git gcc make zlib1g-dev\ 
     && git clone https://github.com/ghdl/ghdl.git \
     && cd ghdl \
     && ./configure --prefix=/usr/local \
     && make \
     && make install \
-    && cd .. \
+    && cd .. 
     #for  ghdl-yosys-plugin
-    && git clone https://github.com/ghdl/ghdl-yosys-plugin.git \
+RUN git clone https://github.com/ghdl/ghdl-yosys-plugin.git \
     && cd ghdl-yosys-plugin \
     && make \
     && make install \
-    && cd .. \
+    && cd .. 
     # sonar-scanner
+RUN apt-get install -y curl \
     && curl -ksSLO https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.4.0.2170.zip \
     && unzip sonar-scanner-cli-4.4.0.2170.zip \
-    && mv /sonar-scanner-4.4.0.2170 /sonar-scanner \
+    && mv /sonar-scanner-4.4.0.2170 /sonar-scanner 
     #Addon for RC scanner
-    && curl -ksSLO https://github.com/Linty-Services/VHDL-RC/releases/download/v3.1/rc-scanner-4.0.0.1744-1-linux.tar.gz \
+RUN curl -ksSLO https://github.com/Linty-Services/VHDL-RC/releases/download/v3.1/rc-scanner-4.0.0.1744-1-linux.tar.gz \
     && tar -zxvf rc-scanner-4.0.0.1744-1-linux.tar.gz \
     && mkdir /sonar-scanner/rc \
     && cp -r /rc-scanner-4.0.0.1744-1-linux/rc/* /sonar-scanner/rc/ 
