@@ -22,7 +22,7 @@ RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >
         libzarith-ocaml-dev=1.9.1-* \
         menhir=20200624-* \
     # Hadolint tool
-    && curl -ksSLO https://github.com/hadolint/hadolint/releases/download/v1.21.0/hadolint-Linux-x86_64
+    && curl -ksSLO https://github.com/hadolint/hadolint/releases/download/v1.21.0/hadolint-Linux-x86_64 \
     # sonar-scanner
     && curl -ksSLO https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.4.0.2170.zip \
     && unzip sonar-scanner-cli-4.4.0.2170.zip \
