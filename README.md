@@ -254,7 +254,7 @@ sonar-scanning:
 | [RATS](https://code.google.com/archive/p/rough-auditing-tool-for-security/)    | 2.4           | rats-report.xml     |
 | [Frama-C](https://frama-c.com/index.html)                                      | 20.0          |                     |
 | [Infer](https://fbinfer.com/)                                                  | 0.17.0        |                     |
-| [VHDLRC](https://github.com/VHDLTool/sonar-VHDLRC)                             | 1.8.043       |                     |
+| [VHDLRC](https://github.com/VHDLTool/sonar-VHDLRC)                             | 2.1           |                     |
 
 
 ## Developer's guide

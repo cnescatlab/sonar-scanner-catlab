@@ -36,10 +36,11 @@ RUN apt-get install -y curl unzip\
     && unzip sonar-scanner-cli-4.4.0.2170.zip \
     && mv /sonar-scanner-4.4.0.2170 /sonar-scanner 
     #Addon for RC scanner
-RUN curl -ksSLO https://github.com/Linty-Services/VHDL-RC/releases/download/v3.1/rc-scanner-4.0.0.1744-1-linux.tar.gz \
-    && tar -zxvf rc-scanner-4.0.0.1744-1-linux.tar.gz \
+RUN curl -ksSLO https://github.com/VHDLTool/sonar-VHDLRC/releases/download/v2.1.0/rc-scanner-4.1-linux.tar.xz \
+    && unxz rc-scanner-4.1-linux.tar.xz \
+    && tar xvf rc-scanner-4.1-linux.tar \
     && mkdir /sonar-scanner/rc \
-    && cp -r /rc-scanner-4.0.0.1744-1-linux/rc/* /sonar-scanner/rc/ 
+    && cp -r /rc-scanner-4.1-linux/rc/* /sonar-scanner/rc/ 
 
 ################################################################################
 
@@ -104,7 +105,7 @@ COPY --from=builder /usr/local/bin/yosys-smtbmc /usr/local/bin/yosys-smtbmc
 # add ghdl from builder
 COPY --from=builder /usr/local/lib/libghdl.a /usr/local/lib/libghdl.a 
 COPY --from=builder /usr/local/lib/libghdl.link /usr/local/lib/libghdl.link 
-COPY --from=builder /usr/local/lib/libghdl-1_0_dev.so /usr/local/lib/libghdl-1_0_dev.so 
+COPY --from=builder /usr/local/lib/libghdl-2_0_0_dev.so /usr/local/lib/libghdl-2_0_0_dev.so 
 COPY --from=builder /usr/local/lib/libghdlvpi.so /usr/local/lib/libghdlvpi.so 
 COPY --from=builder /usr/local/lib/ghdl /usr/local/lib/ghdl
 COPY --from=builder /usr/local/bin/ghdl /usr/local/bin/ghdl 
