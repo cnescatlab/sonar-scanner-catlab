@@ -8,7 +8,7 @@ RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >
         curl=7.72.0-* \
         # for C/C++ tools
         make=4.3-* \
-        g\+\+=4:10.1.0-* \
+        g\+\+=4:10.2.0-* \
         python3=3.8.2-* \
         libpcre3-dev=2:8.39-* \
         unzip=6.0-* \
@@ -19,7 +19,7 @@ RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >
         libfindlib-ocaml-dev=1.8.1-* \
         libocamlgraph-ocaml-dev=1.8.8-* \
         libyojson-ocaml-dev=1.7.0-* \
-        libzarith-ocaml-dev=1.9.1-* \
+        libzarith-ocaml-dev=1.10-* \
         menhir=20200624-* \
     # sonar-scanner
     && curl -ksSLO https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.4.0.2170.zip \
@@ -143,15 +143,15 @@ RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >
             # Needed by Frama-C
             ocaml-findlib=1.8.1-* \
             libocamlgraph-ocaml-dev=1.8.8-* \
-            libzarith-ocaml=1.9.1-* \
+            libzarith-ocaml=1.10-* \
             libyojson-ocaml=1.7.0-* \
             # Needed by Infer
             libsqlite3-0=3.33.0-* \
-            libtinfo5=6.2-* \
+            libtinfo5=6.2* \
             python2.7=2.7.18-* \
             # Compilation tools needed by Infer
-            gcc=4:10.1.0-* \
-            g\+\+=4:10.1.0-* \
+            gcc=4:10.2.0-* \
+            g\+\+=4:10.2.0-* \
             clang=1:9.0-* \
             make=4.3-* \
     && rm -rf /var/lib/apt/lists/* \
