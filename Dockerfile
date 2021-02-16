@@ -104,7 +104,7 @@ RUN addgroup sonar-scanner \
 
 # Add hadolint from builder stage
 COPY --from=builder /hadolint /opt
-RUN chmod 700 /opt/hadolint
+RUN chmod 755 /opt/hadolint
 
 # Add sonar-scanner from builder
 COPY --from=builder /sonar-scanner/bin/sonar-scanner \
