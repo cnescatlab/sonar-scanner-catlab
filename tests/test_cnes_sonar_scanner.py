@@ -422,6 +422,17 @@ class TestCNESSonarScanner:
         cmd = f"frama-c tests/c_cpp/framac/CruiseControl.c tests/c_cpp/framac/CruiseControl_const.c -rte -metrics -report-csv {report}"
         self.analysis_tool("Frama-C", cmd, ref, output)
 
+
+    def test_language_hadolint(self):
+        """
+        As a user of this image, I want to run hadolint to lint my Dockerfile
+        so that I can see if my Dockerfile respect best pratices.
+        """
+        ref="tests/docker/reference-hadolint-results.xml"
+        output="tests/docker/tmp-hadolint-results.xml"
+        cmd=f"hadolint -f checkstyle tests/docker/Dockerfile > {output}"
+        self.analysis_tool("hadolint, cmd, ref, output, False)
+
     def test_tool_infer(self):
         """
         As a user of this image, I want to run Infer from within a container
