@@ -422,7 +422,7 @@ class TestCNESSonarScanner:
         cmd = f"frama-c tests/c_cpp/framac/CruiseControl.c tests/c_cpp/framac/CruiseControl_const.c -rte -metrics -report-csv {report}"
         self.analysis_tool("Frama-C", cmd, ref, output)
 
-    def test_language_hadolint(self):
+    def test_tool_hadolint(self):
         """
         As a user of this image, I want to run hadolint to lint my Dockerfile
         so that I can see if my Dockerfile respect best pratices.
