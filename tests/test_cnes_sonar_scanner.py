@@ -430,7 +430,7 @@ class TestCNESSonarScanner:
         ref="tests/docker/reference-hadolint-results.xml"
         output="tests/docker/tmp-hadolint-results.xml"
         cmd=f"hadolint -f checkstyle tests/docker/Dockerfile > {output}"
-        self.analysis_tool("hadolint, cmd, ref, output, False)
+        self.analysis_tool("hadolint", cmd, ref, output, False)
 
     def test_tool_infer(self):
         """
