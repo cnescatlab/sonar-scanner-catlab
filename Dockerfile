@@ -118,6 +118,8 @@ RUN mkdir -p /usr/share/man/man1
 RUN apt-get install -o APT::Immediate-Configure=false -y xvfb libswt-gtk-4-jni libswt-gtk-4-java openjdk-11-jre
     ## needed for ghdl
 RUN apt-get install -o APT::Immediate-Configure=false -y gnat
+    ##missing lib for yosys
+RUN apt-get install -o APT::Immediate-Configure=false -y libreadline8 libtcl8.6
     ## clean apt
 RUN rm -rf /var/lib/apt/lists/* \
     && rm -rf /usr/local/man 
