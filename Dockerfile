@@ -36,7 +36,7 @@ RUN apt-get install -y curl unzip\
     && unzip sonar-scanner-cli-4.4.0.2170.zip \
     && mv /sonar-scanner-4.4.0.2170 /sonar-scanner 
     #Addon for RC scanner
-RUN curl -ksSLO https://github.com/VHDLTool/sonar-VHDLRC/releases/download/v2.1.0/rc-scanner-4.1-linux.tar.xz \
+RUN curl -ksSLO https://github.com/VHDLTool/sonar-VHDLRC/releases/download/V3.3/rc-scanner-4.1-linux.tar.xz \
     && unxz rc-scanner-4.1-linux.tar.xz \
     && tar xvf rc-scanner-4.1-linux.tar \
     && mkdir /sonar-scanner/rc \

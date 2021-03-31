@@ -1,6 +1,6 @@
 WORK_DIR=build_dir
-VHDL_DIR=../
-
+VHDL_DIR=../trunk/vhdl
+echo "start GDHL compilation script"
 mkdir $WORK_DIR
 cd $WORK_DIR
 
@@ -34,3 +34,4 @@ ghdl -a  -fexplicit -fsynopsys $VHDL_DIR/mlite_cpu.vhd
 
 #elaborate design need to be done in yosys with command ghdl -fexplicit -fsynopsys plasma
 ghdl -e -fexplicit -fsynopsys plasma
+echo "end GDHL compilation script"
