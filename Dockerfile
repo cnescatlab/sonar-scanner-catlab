@@ -109,6 +109,8 @@ COPY --from=builder /usr/local/lib/libghdl-2_0_0_dev.so /usr/local/lib/libghdl-2
 COPY --from=builder /usr/local/lib/libghdlvpi.so /usr/local/lib/libghdlvpi.so 
 COPY --from=builder /usr/local/lib/ghdl /usr/local/lib/ghdl
 COPY --from=builder /usr/local/bin/ghdl /usr/local/bin/ghdl 
+#set yosys plugins
+COPY --from=builder /usr/local/share/yosys /usr/local/share/yosys
 
 # Install tools
 RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >> /etc/apt/sources.list \
@@ -124,11 +126,12 @@ RUN apt-get install -o APT::Immediate-Configure=false -y libreadline8 libtcl8.6
 RUN rm -rf /var/lib/apt/lists/* \
     && rm -rf /usr/local/man 
 
-# Make sonar-scanner executable
+#setup environnement variables
 ENV  PATH="$SONAR_SCANNER_HOME/bin:/usr/local/bin:$PATH" \
     JAVA_HOME="/usr/lib/jvm/java-11-openjdk-amd64" \
     DISPLAY=":0"
 
+# Make sonar-scanner executable
 # Switch to an unpriviledged user
 USER sonar-scanner
 #add fake screen kickstart . this fake screen is needed by eclipse
