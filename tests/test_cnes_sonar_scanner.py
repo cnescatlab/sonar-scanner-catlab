@@ -427,9 +427,9 @@ class TestCNESSonarScanner:
         As a user of this image, I want to run hadolint to lint my Dockerfile
         so that I can see if my Dockerfile respect best pratices.
         """
-        ref="tests/docker/reference-hadolint-results.xml"
-        output="tests/docker/tmp-hadolint-results.xml"
-        cmd=f"hadolint -f checkstyle tests/docker/Dockerfile > {output}"
+        ref = "tests/docker/reference-hadolint-results.xml"
+        output = "tests/docker/tmp-hadolint-results.xml"
+        cmd = f"hadolint -f checkstyle tests/docker/Dockerfile > {output}"
         self.analysis_tool("hadolint", cmd, ref, output, False)
 
     def test_tool_infer(self):
