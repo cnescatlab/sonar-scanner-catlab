@@ -184,10 +184,9 @@ RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >
 
 # Make sonar-scanner, CNES pylint, C/C++ and hadolint tools executable
 ENV PYTHONPATH="$PYTHONPATH:/opt/python/cnes-pylint-extension-5.0.0/checkers" \
-    PATH="$SONAR_SCANNER_HOME/bin:/usr/local/bin:$PATH" \
+    PATH="/opt:$SONAR_SCANNER_HOME/bin:/usr/local/bin:$PATH" \
     PYLINTHOME="$SONAR_SCANNER_HOME/.pylint.d" \
     JAVA_HOME="/usr/lib/jvm/java-11-openjdk-amd64" \
-    PATH="/opt:$PATH"
 
 # Switch to an unpriviledged user
 USER sonar-scanner
