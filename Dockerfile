@@ -9,7 +9,7 @@ RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >
         # for C/C++ tools
         make=4.3-* \
         g\+\+=4:10.2.1-* \
-        python3=3.9.1-* \
+        python3=3.9.2-* \
         libpcre3-dev=2:8.39-* \
         unzip=6.0-* \
         xz-utils=5.2.4-* \
@@ -20,9 +20,10 @@ RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >
         libocamlgraph-ocaml-dev=1.8.8-* \
         libyojson-ocaml-dev=1.7.0-* \
         libzarith-ocaml-dev=1.11-* \
-        menhir=20201216-* \
-    # Hadolint tool
-    && curl -ksSLO https://github.com/hadolint/hadolint/releases/download/v1.21.0/hadolint-Linux-x86_64 \
+        menhir=20201216-*
+        
+# Hadolint tool
+RUN curl -ksSLO https://github.com/hadolint/hadolint/releases/download/v2.7.0/hadolint-Linux-x86_64 \
     && mv /hadolint-Linux-x86_64 /hadolint \
     # sonar-scanner
     && curl -ksSLO https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.4.0.2170.zip \
@@ -186,7 +187,7 @@ RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >
 ENV PYTHONPATH="$PYTHONPATH:/opt/python/cnes-pylint-extension-5.0.0/checkers" \
     PATH="/opt:$SONAR_SCANNER_HOME/bin:/usr/local/bin:$PATH" \
     PYLINTHOME="$SONAR_SCANNER_HOME/.pylint.d" \
-    JAVA_HOME="/usr/lib/jvm/java-11-openjdk-amd64" \
+    JAVA_HOME="/usr/lib/jvm/java-11-openjdk-amd64"
 
 # Switch to an unpriviledged user
 USER sonar-scanner
