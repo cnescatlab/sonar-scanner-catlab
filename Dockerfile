@@ -24,23 +24,23 @@ RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >
         
 # Hadolint tool
 RUN curl -ksSLO https://github.com/hadolint/hadolint/releases/download/v2.7.0/hadolint-Linux-x86_64 \
-    && mv /hadolint-Linux-x86_64 /hadolint \
-    # sonar-scanner
-    && curl -ksSLO https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.4.0.2170.zip \
+    && mv /hadolint-Linux-x86_64 /hadolint
+# SonarScanner
+RUN curl -ksSLO https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.4.0.2170.zip \
     && unzip sonar-scanner-cli-4.4.0.2170.zip \
-    && mv /sonar-scanner-4.4.0.2170 /sonar-scanner \
-    # CppCheck
-    && curl -ksSLO https://downloads.sourceforge.net/project/cppcheck/cppcheck/1.90/cppcheck-1.90.tar.gz \
+    && mv /sonar-scanner-4.4.0.2170 /sonar-scanner
+# CppCheck
+RUN curl -ksSLO https://downloads.sourceforge.net/project/cppcheck/cppcheck/1.90/cppcheck-1.90.tar.gz \
     && tar -zxvf cppcheck-1.90.tar.gz \
     && make -C cppcheck-1.90/ install \
             MATCHCOMPILER="yes" \
             FILESDIR="/usr/share/cppcheck" \
             HAVE_RULES="yes" \
-            CXXFLAGS="-O2 -DNDEBUG -Wall -Wno-sign-compare -Wno-unused-function -Wno-deprecated-declarations" \
-    # RATS (and expat)
-    && curl -ksSLO https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/rough-auditing-tool-for-security/rats-2.4.tgz \
-    && curl -ksSLO http://downloads.sourceforge.net/project/expat/expat/2.0.1/expat-2.0.1.tar.gz \
-    && tar -xvzf expat-2.0.1.tar.gz \
+            CXXFLAGS="-O2 -DNDEBUG -Wall -Wno-sign-compare -Wno-unused-function -Wno-deprecated-declarations"
+# RATS (and expat)
+RUN curl -ksSLO https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/rough-auditing-tool-for-security/rats-2.4.tgz \
+    && curl -ksSLO https://sourceforge.net/projects/expat/files/expat/2.0.1/expat-2.0.1-RENAMED-VULNERABLE-PLEASE-USE-2.3.0-INSTEAD.tar.gz \
+    && tar -xvzf expat-2.0.1-RENAMED-VULNERABLE-PLEASE-USE-2.3.0-INSTEAD.tar.gz \
     && cd expat-2.0.1 \
     && ./configure \
     && make \
@@ -140,10 +140,10 @@ RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >
     && mkdir -p /usr/share/man/man1 \
     && apt-get install -y --no-install-recommends \
             # Needed by sonar-scanner
-            openjdk-11-jre-headless=11.0.10* \
+            openjdk-11-jre-headless=11.0.12* \
             # Needed by Pylint
-            python3=3.9.1-* \
-            python3-pip=20.1.1-* \
+            python3=3.9.2-* \
+            python3-pip=20.3.4-* \
             # Vera++
             vera\+\+=1.2.1-* \
             # Shellcheck
