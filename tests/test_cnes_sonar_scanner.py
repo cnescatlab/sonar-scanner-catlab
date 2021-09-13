@@ -50,7 +50,7 @@ class TestCNESSonarScanner:
     SONARQUBE_LOCAL_URL = os.environ.get("SONARQUBE_LOCAL_URL", "http://localhost:9000")
     SONARQUBE_TAG = os.environ.get("SONARQUBE_TAG", "latest")
     SONARQUBE_NETWORK = os.environ.get("SONARQUBE_NETWORK", "sonarbridge")
-    _SONAR_SCANNER_IMAGE = "lequal/sonar-scanner"
+    _SONAR_SCANNER_IMAGE = "lequal/sonar-scanner:latest"
     _PROJECT_ROOT_DIR = str(Path(os.getcwd()).parent)
 
     # Functions
@@ -427,9 +427,9 @@ class TestCNESSonarScanner:
         As a user of this image, I want to run hadolint to lint my Dockerfile
         so that I can see if my Dockerfile respect best pratices.
         """
-        ref = "tests/docker/reference-hadolint-results.xml"
-        output = "tests/docker/tmp-hadolint-results.xml"
-        cmd = f"hadolint -f checkstyle tests/docker/Dockerfile > {output}"
+        ref = "tests/docker/reference-hadolint-results"
+        output = "tests/docker/tmp-hadolint-results"
+        cmd =  "hadolint --no-fail tests/docker/Dockerfile"
         self.analysis_tool("hadolint", cmd, ref, output)
 
     def test_tool_infer(self):

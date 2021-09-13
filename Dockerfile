@@ -80,6 +80,10 @@ ENV SRC_DIR=/usr/src \
 # Same workdir as the offical sonar-scanner image
 WORKDIR ${SRC_DIR}
 
+# Add hadolint from builder stage
+COPY --from=builder /hadolint /opt
+RUN chmod 777 /opt/hadolint
+
 # Add an unprivileged user
 RUN addgroup sonar-scanner \
     && adduser \
@@ -98,14 +102,11 @@ RUN addgroup sonar-scanner \
             "$SONAR_SCANNER_HOME/.sonar" \
             "$SONAR_SCANNER_HOME/.pylint.d" \
             "$SRC_DIR" \
+            "/opt/hadolint" \
     && chmod -R 777 \
             "$SONAR_SCANNER_HOME/.sonar" \
             "$SONAR_SCANNER_HOME/.pylint.d" \
             "$SRC_DIR"
-
-# Add hadolint from builder stage
-COPY --from=builder /hadolint /opt
-RUN chmod 755 /opt/hadolint
 
 # Add sonar-scanner from builder
 COPY --from=builder /sonar-scanner/bin/sonar-scanner \
