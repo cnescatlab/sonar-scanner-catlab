@@ -39,7 +39,7 @@ RUN curl -ksSLO https://downloads.sourceforge.net/project/cppcheck/cppcheck/1.90
             CXXFLAGS="-O2 -DNDEBUG -Wall -Wno-sign-compare -Wno-unused-function -Wno-deprecated-declarations"
 # RATS (and expat)
 RUN curl -ksSLO https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/rough-auditing-tool-for-security/rats-2.4.tgz \
-    && curl -ksSLO https://sourceforge.net/projects/expat/files/expat/2.0.1/expat-2.0.1-RENAMED-VULNERABLE-PLEASE-USE-2.3.0-INSTEAD.tar.gz \
+    && curl -ksSLO https://sourceforge.net/projects/expat/files/expat/2.4.1/expat-2.4.1.tar.gz \
     && tar -xvzf expat-2.0.1-RENAMED-VULNERABLE-PLEASE-USE-2.3.0-INSTEAD.tar.gz \
     && cd expat-2.0.1 \
     && ./configure \
