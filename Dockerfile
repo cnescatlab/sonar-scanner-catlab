@@ -41,7 +41,7 @@ RUN curl -ksSLO https://downloads.sourceforge.net/project/cppcheck/cppcheck/1.90
 RUN curl -ksSLO https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/rough-auditing-tool-for-security/rats-2.4.tgz \
     && curl -ksSLO https://sourceforge.net/projects/expat/files/expat/2.4.1/expat-2.4.1.tar.gz \
     && tar -xvzf expat-2.4.1.tar.gz \
-    && cd expat-2.0.1 \
+    && cd expat-2.4.1 \
     && ./configure \
     && make \
     && make install \
