@@ -1,41 +1,43 @@
 # Builder image for analysis tools
-FROM debian:10.5-slim AS builder
+FROM debian:11-slim AS builder
 
 # Install tools from sources
 RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >> /etc/apt/sources.list \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
-        curl=7.72.0-* \
+        curl=7.74.0-* \
         # for C/C++ tools
         make=4.3-* \
-        g\+\+=4:10.2.0-* \
-        python3=3.8.2-* \
+        g\+\+=4:10.2.1-* \
+        python3=3.9.2-* \
         libpcre3-dev=2:8.39-* \
         unzip=6.0-* \
-        xz-utils=5.2.4-* \
+        xz-utils=5.2.5-* \
         # for Frama-C
-        ocaml=4.08.1-* \
+        ocaml=4.11.1-* \
         ocaml-findlib=1.8.1-* \
         libfindlib-ocaml-dev=1.8.1-* \
         libocamlgraph-ocaml-dev=1.8.8-* \
         libyojson-ocaml-dev=1.7.0-* \
-        libzarith-ocaml-dev=1.10-* \
-        menhir=20200624-* \
-    # sonar-scanner
-    && curl -ksSLO https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.4.0.2170.zip \
+        libzarith-ocaml-dev=1.11-* \
+        menhir=20201216-*
+
+# sonar-scanner
+RUN curl -ksSLO https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.4.0.2170.zip \
     && unzip sonar-scanner-cli-4.4.0.2170.zip \
-    && mv /sonar-scanner-4.4.0.2170 /sonar-scanner \
-    # CppCheck
-    && curl -ksSLO https://downloads.sourceforge.net/project/cppcheck/cppcheck/1.90/cppcheck-1.90.tar.gz \
+    && mv /sonar-scanner-4.4.0.2170 /sonar-scanner
+
+# CppCheck
+RUN curl -ksSLO https://downloads.sourceforge.net/project/cppcheck/cppcheck/1.90/cppcheck-1.90.tar.gz \
     && tar -zxvf cppcheck-1.90.tar.gz \
     && make -C cppcheck-1.90/ install \
             MATCHCOMPILER="yes" \
             FILESDIR="/usr/share/cppcheck" \
             HAVE_RULES="yes" \
-            CXXFLAGS="-O2 -DNDEBUG -Wall -Wno-sign-compare -Wno-unused-function -Wno-deprecated-declarations" \
-    # RATS (and expat)
-    && curl -ksSLO https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/rough-auditing-tool-for-security/rats-2.4.tgz \
-    && curl -ksSLO http://downloads.sourceforge.net/project/expat/expat/2.0.1/expat-2.0.1.tar.gz \
+            CXXFLAGS="-O2 -DNDEBUG -Wall -Wno-sign-compare -Wno-unused-function -Wno-deprecated-declarations"
+# RATS (and expat)
+RUN curl -ksSLO https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/rough-auditing-tool-for-security/rats-2.4.tgz \
+    && curl -ksSLO https://github.com/libexpat/libexpat/releases/download/R_2_0_1/expat-2.0.1.tar.gz \
     && tar -xvzf expat-2.0.1.tar.gz \
     && cd expat-2.0.1 \
     && ./configure \
@@ -48,23 +50,23 @@ RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >
     && make \
     && make install \
     && ./rats \
-    && cd .. \
-    # Frama-C
-    && curl -ksSLO https://frama-c.com/download/frama-c-20.0-Calcium.tar.gz \
+    && cd ..
+# Frama-C
+RUN curl -ksSLO https://frama-c.com/download/frama-c-20.0-Calcium.tar.gz \
     && tar -zxvf frama-c-20.0-Calcium.tar.gz \
     && cd frama-c-20.0-Calcium \
     && ./configure --disable-gui --disable-wp \
     && make \
     && make install \
-    && cd .. \
-    # Infer
-    && curl -ksSLO https://github.com/facebook/infer/releases/download/v0.17.0/infer-linux64-v0.17.0.tar.xz \
+    && cd ..
+# Infer
+RUN curl -ksSLO https://github.com/facebook/infer/releases/download/v0.17.0/infer-linux64-v0.17.0.tar.xz \
     && tar -C /opt -Jxvf infer-linux64-v0.17.0.tar.xz
 
 ################################################################################
 
 # Final image based on the official sonar-scanner image
-FROM debian:10.5-slim
+FROM debian:11-slim
 
 LABEL maintainer="CATLab <catlab@cnes.fr>"
 
@@ -123,7 +125,7 @@ COPY --from=builder /opt/infer-linux64-v0.17.0/lib /opt/infer-linux64-v0.17.0/li
 COPY pylintrc.d/ /opt/python/
 
 # Download CNES pylint extension
-ADD https://github.com/cnescatlab/cnes-pylint-extension/archive/v5.0.0.tar.gz \
+ADD https://github.com/cnescatlab/cnes-pylint-extension/archive/refs/tags/v6.0.0.tar.gz \
     /tmp/python/
 
 # Install tools
@@ -132,10 +134,10 @@ RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >
     && mkdir -p /usr/share/man/man1 \
     && apt-get install -y --no-install-recommends \
             # Needed by sonar-scanner
-            openjdk-11-jre-headless=11.0.8* \
+            openjdk-11-jre-headless=11.0.16* \
             # Needed by Pylint
-            python3=3.8.2-* \
-            python3-pip=20.1.1-* \
+            python3=3.9.2-* \
+            python3-pip=20.3.4-* \
             # Vera++
             vera\+\+=1.2.1-* \
             # Shellcheck
@@ -143,40 +145,40 @@ RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >
             # Needed by Frama-C
             ocaml-findlib=1.8.1-* \
             libocamlgraph-ocaml-dev=1.8.8-* \
-            libzarith-ocaml=1.10-* \
+            libzarith-ocaml=1.11-* \
             libyojson-ocaml=1.7.0-* \
             # Needed by Infer
-            libsqlite3-0=3.33.0-* \
+            libsqlite3-0=3.34.1-* \
             libtinfo5=6.2* \
             python2.7=2.7.18-* \
             # Compilation tools needed by Infer
-            gcc=4:10.2.0-* \
-            g\+\+=4:10.2.0-* \
-            clang=1:9.0-* \
+            gcc=4:10.2.1-* \
+            g\+\+=4:10.2.1-* \
+            clang=1:11.0-* \
             make=4.3-* \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /usr/local/man \
     # Install pylint and CNES pylint extension
-    && mkdir -p /opt/python/cnes-pylint-extension-5.0.0 \
-    && tar -xvzf /tmp/python/v5.0.0.tar.gz -C /tmp/python \
-    && mv /tmp/python/cnes-pylint-extension-5.0.0/checkers /opt/python/cnes-pylint-extension-5.0.0/ \
+    && mkdir -p /opt/python/cnes-pylint-extension-6.0.0 \
+    && tar -xvzf /tmp/python/v6.0.0.tar.gz -C /tmp/python \
+    && mv /tmp/python/cnes-pylint-extension-6.0.0/checkers /opt/python/cnes-pylint-extension-6.0.0/ \
     && rm -rf /tmp/python \
     && pip install --no-cache-dir \
-            setuptools-scm==3.5.0 \
-            pytest-runner==5.2 \
-            wrapt==1.12.1 \
-            six==1.14.0 \
-            lazy-object-proxy==1.4.3 \
-            mccabe==0.6.1 \
-            isort==4.3.21 \
-            typed-ast==1.4.1 \
-            astroid==2.4.0 \
-            pylint==2.5.0 \
+            setuptools-scm==7.1.0 \
+            pytest-runner==6.0.0 \
+            wrapt==1.15.0 \
+            six==1.16.0 \
+            lazy-object-proxy==1.9.0 \
+            mccabe==0.7.0 \
+            isort==5.12.0 \
+            typed-ast==1.5.4 \
+            astroid==2.15.2 \
+            pylint==2.17.2 \
     # Infer
     && ln -s "/opt/infer-linux64-v0.17.0/bin/infer" /usr/local/bin/infer
 
 # Make sonar-scanner, CNES pylint and C/C++ tools executable
-ENV PYTHONPATH="$PYTHONPATH:/opt/python/cnes-pylint-extension-5.0.0/checkers" \
+ENV PYTHONPATH="$PYTHONPATH:/opt/python/cnes-pylint-extension-6.0.0/checkers" \
     PATH="$SONAR_SCANNER_HOME/bin:/usr/local/bin:$PATH" \
     PYLINTHOME="$SONAR_SCANNER_HOME/.pylint.d" \
     JAVA_HOME="/usr/lib/jvm/java-11-openjdk-amd64"
