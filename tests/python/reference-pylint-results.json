@@ -3,11 +3,13 @@
         "type": "convention",
         "module": "simplecaesar",
         "obj": "",
-        "line": 19,
-        "column": 19,
+        "line": 13,
+        "column": 3,
+        "endLine": 13,
+        "endColumn": 29,
         "path": "tests/python/src/simplecaesar.py",
-        "symbol": "bad-whitespace",
-        "message": "Exactly one space required around assignment\n            encoded=encoded + letters[x]\n                   ^",
-        "message-id": "C0326"
+        "symbol": "unneeded-not",
+        "message": "Consider changing \"not not choice == 'encode'\" to \"choice == 'encode'\"",
+        "message-id": "C0113"
     }
 ]

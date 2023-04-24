@@ -36,7 +36,7 @@ disable=all
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
 # multiple time. See also the "--disable" option for examples.
-enable=c0326,w0406,w0404,r0401,c0411,e0601,w0602,e0602,c0113,c0122,w0312,w0603,w0612,w0621,c0412,c0413,w0403,w0102,w0703,w1625,r0204,e0213,r0203,w0622,c0204,c0202,e0108
+enable=w0406,w0404,r0401,c0411,e0601,w0602,e0602,c0113,c0122,w0312,w0603,w0612,w0621,c0412,c0413,w0403,w0102,w0703,w1625,r0204,e0213,r0203,w0622,c0204,c0202,e0108
 
 [REPORTS]
 
