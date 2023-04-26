@@ -78,8 +78,6 @@ RUN curl -ksSLO https://github.com/facebook/infer/releases/download/v1.1.0/infer
 # Final image based on the official sonar-scanner image
 FROM debian:11-slim
 
-LABEL maintainer="CATLab <catlab@cnes.fr>"
-
 # Set variables for the sonar-scanner
 ENV SRC_DIR=/usr/src \
     SONAR_SCANNER_HOME=/opt/sonar-scanner \
