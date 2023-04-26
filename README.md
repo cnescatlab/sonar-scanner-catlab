@@ -236,15 +236,15 @@ sonar-scanning:
 
 | Tool                                                                           | Version       | Default report file |
 |--------------------------------------------------------------------------------|---------------|---------------------|
-| [sonar-scanner](https://docs.sonarqube.org/latest/analysis/scan/sonarscanner/) | 4.4.0.2170    |                     |
+| [sonar-scanner](https://docs.sonarqube.org/latest/analysis/scan/sonarscanner/) | 4.8.0.2856    |                     |
 | [ShellCheck](https://github.com/koalaman/shellcheck)                           | 0.7.1         |                     |
-| [pylint](http://pylint.pycqa.org/en/latest/user_guide/index.html)              | 2.5.0         | pylint-report.txt   |
+| [pylint](http://pylint.pycqa.org/en/latest/user_guide/index.html)              | 2.17.2        | pylint-report.txt   |
 | [CNES pylint extension](https://github.com/cnescatlab/cnes-pylint-extension)   | 6.0.0         |                     |
-| [CppCheck](https://github.com/danmar/cppcheck)                                 | 1.90          | cppcheck-report.xml |
+| [CppCheck](https://github.com/danmar/cppcheck)                                 | 2.10          | cppcheck-report.xml |
 | [Vera++](https://bitbucket.org/verateam/vera/wiki/Home)                        | 1.2.1         | vera-report.xml     |
 | [RATS](https://code.google.com/archive/p/rough-auditing-tool-for-security/)    | 2.4           | rats-report.xml     |
-| [Frama-C](https://frama-c.com/index.html)                                      | 20.0          |                     |
-| [Infer](https://fbinfer.com/)                                                  | 0.17.0        |                     |
+| [Frama-C](https://frama-c.com/index.html)                                      | 26.1-Iron     |                     |
+| [Infer](https://fbinfer.com/)                                                  | 1.1.0         |                     |
 
 ## Developer's guide
 

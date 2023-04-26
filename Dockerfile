@@ -14,27 +14,36 @@ RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >
         unzip=6.0-* \
         xz-utils=5.2.5-* \
         # for Frama-C
-        ocaml=4.11.1-* \
+        opam=2.0.8-* \
+        m4=1.4.18-* \
         ocaml-findlib=1.8.1-* \
         libfindlib-ocaml-dev=1.8.1-* \
         libocamlgraph-ocaml-dev=1.8.8-* \
-        libyojson-ocaml-dev=1.7.0-* \
-        libzarith-ocaml-dev=1.11-* \
-        menhir=20201216-*
+        menhir=20201216-* \
+        ca-certificates
+
+# Configure Opam for Frama-C
+RUN opam init -y --disable-sandboxing \
+    && eval $(opam env)
+RUN opam install -y depext \
+    && opam depext -y frama-c \
+    && opam install -y --deps-only frama-c
+ENV PATH="/root/.opam/default/bin:$PATH"
 
 # sonar-scanner
-RUN curl -ksSLO https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.4.0.2170.zip \
-    && unzip sonar-scanner-cli-4.4.0.2170.zip \
-    && mv /sonar-scanner-4.4.0.2170 /sonar-scanner
+RUN curl -ksSLO https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip \
+    && unzip sonar-scanner-cli-4.8.0.2856-linux.zip \
+    && mv /sonar-scanner-4.8.0.2856-linux /sonar-scanner
 
 # CppCheck
-RUN curl -ksSLO https://downloads.sourceforge.net/project/cppcheck/cppcheck/1.90/cppcheck-1.90.tar.gz \
-    && tar -zxvf cppcheck-1.90.tar.gz \
-    && make -C cppcheck-1.90/ install \
+RUN curl -ksSLO https://github.com/danmar/cppcheck/archive/refs/tags/2.10.tar.gz \
+    && tar -zxvf 2.10.tar.gz  \
+    && make -C cppcheck-2.10/ install \
             MATCHCOMPILER="yes" \
             FILESDIR="/usr/share/cppcheck" \
             HAVE_RULES="yes" \
             CXXFLAGS="-O2 -DNDEBUG -Wall -Wno-sign-compare -Wno-unused-function -Wno-deprecated-declarations"
+
 # RATS (and expat)
 RUN curl -ksSLO https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/rough-auditing-tool-for-security/rats-2.4.tgz \
     && curl -ksSLO https://github.com/libexpat/libexpat/releases/download/R_2_0_1/expat-2.0.1.tar.gz \
@@ -51,17 +60,18 @@ RUN curl -ksSLO https://storage.googleapis.com/google-code-archive-downloads/v2/
     && make install \
     && ./rats \
     && cd ..
+
 # Frama-C
-RUN curl -ksSLO https://frama-c.com/download/frama-c-20.0-Calcium.tar.gz \
-    && tar -zxvf frama-c-20.0-Calcium.tar.gz \
-    && cd frama-c-20.0-Calcium \
-    && ./configure --disable-gui --disable-wp \
-    && make \
+RUN curl -ksSLO https://frama-c.com/download/frama-c-26.1-Iron.tar.gz \
+    && tar -zxvf frama-c-26.1-Iron.tar.gz \
+    && cd frama-c-26.1-Iron \
+    && opam exec -- make RELEASE=yes \
     && make install \
     && cd ..
+
 # Infer
-RUN curl -ksSLO https://github.com/facebook/infer/releases/download/v0.17.0/infer-linux64-v0.17.0.tar.xz \
-    && tar -C /opt -Jxvf infer-linux64-v0.17.0.tar.xz
+RUN curl -ksSLO https://github.com/facebook/infer/releases/download/v1.1.0/infer-linux64-v1.1.0.tar.xz \
+    && tar -C /opt -Jxvf infer-linux64-v1.1.0.tar.xz
 
 ################################################################################
 
@@ -118,8 +128,8 @@ COPY --from=builder /usr/bin/cppcheck-htmlreport /usr/bin
 COPY --from=builder /usr/local /usr/local
 
 # Add Infer from builder stage
-COPY --from=builder /opt/infer-linux64-v0.17.0/bin /opt/infer-linux64-v0.17.0/bin
-COPY --from=builder /opt/infer-linux64-v0.17.0/lib /opt/infer-linux64-v0.17.0/lib
+COPY --from=builder /opt/infer-linux64-v1.1.0/bin /opt/infer-linux64-v1.1.0/bin
+COPY --from=builder /opt/infer-linux64-v1.1.0/lib /opt/infer-linux64-v1.1.0/lib
 
 # Add CNES pylintrc A_B, C, D
 COPY pylintrc.d/ /opt/python/
@@ -175,7 +185,7 @@ RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >
             astroid==2.15.2 \
             pylint==2.17.2 \
     # Infer
-    && ln -s "/opt/infer-linux64-v0.17.0/bin/infer" /usr/local/bin/infer
+    && ln -s "/opt/infer-linux64-v1.1.0/bin/infer" /usr/local/bin/infer
 
 # Make sonar-scanner, CNES pylint and C/C++ tools executable
 ENV PYTHONPATH="$PYTHONPATH:/opt/python/cnes-pylint-extension-6.0.0/checkers" \
