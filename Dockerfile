@@ -5,22 +5,22 @@ FROM debian:11-slim AS builder
 RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >> /etc/apt/sources.list \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
-        curl=7.74.0-* \
-        # for C/C++ tools
-        make=4.3-* \
-        g\+\+=4:10.2.1-* \
-        python3=3.9.2-* \
-        libpcre3-dev=2:8.39-* \
-        unzip=6.0-* \
-        xz-utils=5.2.5-* \
-        # for Frama-C
-        opam=2.0.8-* \
-        m4=1.4.18-* \
-        ocaml-findlib=1.8.1-* \
-        libfindlib-ocaml-dev=1.8.1-* \
-        libocamlgraph-ocaml-dev=1.8.8-* \
-        menhir=20201216-* \
-        ca-certificates
+    curl=7.74.0-* \
+    # for C/C++ tools
+    make=4.3-* \
+    g\+\+=4:10.2.1-* \
+    python3=3.9.2-* \
+    libpcre3-dev=2:8.39-* \
+    unzip=6.0-* \
+    xz-utils=5.2.5-* \
+    # for Frama-C
+    opam=2.0.8-* \
+    m4=1.4.18-* \
+    ocaml-findlib=1.8.1-* \
+    libfindlib-ocaml-dev=1.8.1-* \
+    libocamlgraph-ocaml-dev=1.8.8-* \
+    menhir=20201216-* \
+    ca-certificates
 
 # Configure Opam for Frama-C
 RUN opam init -y --disable-sandboxing \
@@ -39,14 +39,14 @@ RUN curl -ksSLO https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/
 RUN curl -ksSLO https://github.com/danmar/cppcheck/archive/refs/tags/2.10.tar.gz \
     && tar -zxvf 2.10.tar.gz  \
     && make -C cppcheck-2.10/ install \
-            MATCHCOMPILER="yes" \
-            FILESDIR="/usr/share/cppcheck" \
-            HAVE_RULES="yes" \
-            CXXFLAGS="-O2 -DNDEBUG -Wall -Wno-sign-compare -Wno-unused-function -Wno-deprecated-declarations"
+    MATCHCOMPILER="yes" \
+    FILESDIR="/usr/share/cppcheck" \
+    HAVE_RULES="yes" \
+    CXXFLAGS="-O2 -DNDEBUG -Wall -Wno-sign-compare -Wno-unused-function -Wno-deprecated-declarations"
 
 # RATS (and expat)
-RUN curl -ksSLO https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/rough-auditing-tool-for-security/rats-2.4.tgz \
-    && curl -ksSLO https://github.com/libexpat/libexpat/releases/download/R_2_0_1/expat-2.0.1.tar.gz \
+RUN curl -ksSLO https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/rough-auditing-tool-for-security/rats-2.4.tgz
+RUN curl -ksSLO https://github.com/libexpat/libexpat/releases/download/R_2_0_1/expat-2.0.1.tar.gz \
     && tar -xvzf expat-2.0.1.tar.gz \
     && cd expat-2.0.1 \
     && ./configure \
@@ -91,25 +91,25 @@ WORKDIR ${SRC_DIR}
 # Add an unprivileged user
 RUN addgroup sonar-scanner \
     && adduser \
-            --home "$SONAR_SCANNER_HOME" \
-            --ingroup sonar-scanner \
-            --disabled-password \
-            --gecos "" \
-            sonar-scanner \
+    --home "$SONAR_SCANNER_HOME" \
+    --ingroup sonar-scanner \
+    --disabled-password \
+    --gecos "" \
+    sonar-scanner \
     && mkdir -p "$SONAR_SCANNER_HOME/bin" \
-            "$SONAR_SCANNER_HOME/lib" \
-            "$SONAR_SCANNER_HOME/conf" \
-            "$SONAR_SCANNER_HOME/.sonar/cache" \
-            "$SONAR_SCANNER_HOME/.pylint.d" \
+    "$SONAR_SCANNER_HOME/lib" \
+    "$SONAR_SCANNER_HOME/conf" \
+    "$SONAR_SCANNER_HOME/.sonar/cache" \
+    "$SONAR_SCANNER_HOME/.pylint.d" \
     && chown -R sonar-scanner:sonar-scanner \
-            "$SONAR_SCANNER_HOME" \
-            "$SONAR_SCANNER_HOME/.sonar" \
-            "$SONAR_SCANNER_HOME/.pylint.d" \
-            "$SRC_DIR" \
+    "$SONAR_SCANNER_HOME" \
+    "$SONAR_SCANNER_HOME/.sonar" \
+    "$SONAR_SCANNER_HOME/.pylint.d" \
+    "$SRC_DIR" \
     && chmod -R 777 \
-            "$SONAR_SCANNER_HOME/.sonar" \
-            "$SONAR_SCANNER_HOME/.pylint.d" \
-            "$SRC_DIR"
+    "$SONAR_SCANNER_HOME/.sonar" \
+    "$SONAR_SCANNER_HOME/.pylint.d" \
+    "$SRC_DIR"
 
 # Add sonar-scanner from builder
 COPY --from=builder /sonar-scanner/bin/sonar-scanner \
@@ -143,29 +143,27 @@ RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >
     && apt-get update \
     && mkdir -p /usr/share/man/man1 \
     && apt-get install -y --no-install-recommends \
-            # Needed by sonar-scanner
-            openjdk-11-jre-headless=11.0.16* \
-            # Needed by Pylint
-            python3=3.9.2-* \
-            python3-pip=20.3.4-* \
-            # Vera++
-            vera\+\+=1.2.1-* \
-            # Shellcheck
-            shellcheck=0.7.1-* \
-            # Needed by Frama-C
-            ocaml-findlib=1.8.1-* \
-            libocamlgraph-ocaml-dev=1.8.8-* \
-            libzarith-ocaml=1.11-* \
-            libyojson-ocaml=1.7.0-* \
-            # Needed by Infer
-            libsqlite3-0=3.34.1-* \
-            libtinfo5=6.2* \
-            python2.7=2.7.18-* \
-            # Compilation tools needed by Infer
-            gcc=4:10.2.1-* \
-            g\+\+=4:10.2.1-* \
-            clang=1:11.0-* \
-            make=4.3-* \
+    # Needed by sonar-scanner
+    openjdk-11-jre-headless=11.0.16* \
+    # Needed by Pylint
+    python3=3.9.2-* \
+    python3-pip=20.3.4-* \
+    # Shellcheck
+    shellcheck=0.7.1-* \
+    # Needed by Frama-C
+    ocaml-findlib=1.8.1-* \
+    libocamlgraph-ocaml-dev=1.8.8-* \
+    libzarith-ocaml=1.11-* \
+    libyojson-ocaml=1.7.0-* \
+    # Needed by Infer
+    libsqlite3-0=3.34.1-* \
+    libtinfo5=6.2* \
+    python2.7=2.7.18-* \
+    # Compilation tools needed by Infer
+    gcc=4:10.2.1-* \
+    g\+\+=4:10.2.1-* \
+    clang=1:11.0-* \
+    make=4.3-* \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /usr/local/man \
     # Install pylint and CNES pylint extension
@@ -174,16 +172,16 @@ RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >
     && mv /tmp/python/cnes-pylint-extension-6.0.0/checkers /opt/python/cnes-pylint-extension-6.0.0/ \
     && rm -rf /tmp/python \
     && pip install --no-cache-dir \
-            setuptools-scm==7.1.0 \
-            pytest-runner==6.0.0 \
-            wrapt==1.15.0 \
-            six==1.16.0 \
-            lazy-object-proxy==1.9.0 \
-            mccabe==0.7.0 \
-            isort==5.12.0 \
-            typed-ast==1.5.4 \
-            astroid==2.15.2 \
-            pylint==2.17.2 \
+    setuptools-scm==7.1.0 \
+    pytest-runner==6.0.0 \
+    wrapt==1.15.0 \
+    six==1.16.0 \
+    lazy-object-proxy==1.9.0 \
+    mccabe==0.7.0 \
+    isort==5.12.0 \
+    typed-ast==1.5.4 \
+    astroid==2.15.2 \
+    pylint==2.17.2 \
     # Infer
     && ln -s "/opt/infer-linux64-v1.1.0/bin/infer" /usr/local/bin/infer
 
