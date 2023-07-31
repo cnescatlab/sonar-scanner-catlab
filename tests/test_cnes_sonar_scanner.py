@@ -343,8 +343,7 @@ class TestCNESSonarScanner:
         so that I can see its level of quality on the SonarQube server.
         """
         sensors = (
-            "Sensor C++ (Community) SquidSensor [cxx]",
-            "Sensor SonarFrama-C [framac]"
+            "Sensor C++ (Community) SquidSensor [cxx]"
         )
         self.language("C/C++", "c++", "c_cpp", sensors, "c-dummy-project", 0, "CNES_C_A", 1)
         # 0 issue are expected with the Sonar way Quality Profile for
@@ -411,17 +410,6 @@ class TestCNESSonarScanner:
         cmd = f"cppcheck --xml-version=2 tests/c_cpp/cppcheck/main.c --output-file={output}"
         self.analysis_tool("cppcheck", cmd, ref, output, False)
 
-    def test_tool_frama_c(self):
-        """
-        As a user of this image, I want to run Frama-C from within a container
-        so that it produces a report.
-        """
-        ref = "tests/c_cpp/reference-framac-results.txt"
-        output = "tests/c_cpp/tmp-framac-results.txt"
-        report = "tests/c_cpp/frama-c.csv"
-        cmd = f"frama-c tests/c_cpp/framac/CruiseControl.c tests/c_cpp/framac/CruiseControl_const.c -rte -metrics -report-csv {report}"
-        self.analysis_tool("Frama-C", cmd, ref, output)
-
     def test_tool_infer(self):
         """
         As a user of this image, I want to run Infer from within a container
@@ -438,16 +426,6 @@ class TestCNESSonarScanner:
         cmd = "pylint --exit-zero -f json --rcfile=/opt/python/pylintrc_RNC_sonar_2017_A_B tests/python/src/simplecaesar.py"
         self.analysis_tool("pylint", cmd, "tests/python/reference-pylint-results.json", "tests/python/tmp-pylint-results.json")
 
-    def test_tool_rats(self):
-        """
-        As a user of this image, I want to run RATS from within a container
-        so that it produces a report.
-        """
-        ref = "tests/c_cpp/reference-rats-results.xml"
-        output = "tests/c_cpp/tmp-rats-results.xml"
-        cmd = "rats --quiet --nofooter --xml -w 3 tests/c_cpp/rats"
-        self.analysis_tool("RATS", cmd, ref, output)
-
     def test_tool_shellcheck(self):
         """
         As a user of this image, I want to run shellcheck from within a container
@@ -455,16 +433,6 @@ class TestCNESSonarScanner:
         """
         cmd = "bash -c 'shellcheck -s sh -f checkstyle tests/shell/src/script.sh || true'"
         self.analysis_tool("shellcheck", cmd, "tests/shell/reference-shellcheck-results.xml", "tests/shell/tmp-shellcheck-results.xml")
-
-    def test_tool_vera(self):
-        """
-        As a user of this image, I want to run Vera++ from within a container
-        so that it produces a report.
-        """
-        ref = "tests/c_cpp/reference-vera-results.xml"
-        output = "tests/c_cpp/tmp-vera-results.xml"
-        cmd = f"vera++ -s -c {output} tests/c_cpp/vera/main.cpp"
-        self.analysis_tool("Vera++", cmd, ref, output, False)
 
     # Test importation of analysis results
     def test_import_cppcheck_results(self):
@@ -478,17 +446,6 @@ class TestCNESSonarScanner:
         self.import_analysis_results("CppCheck Dummy Project", "cppcheck-dummy-project",
             "CNES_C_A", "c++", "tests/c_cpp", "cppcheck", rule_violated, expected_sensor, expected_import)
 
-    def test_import_framac_results(self):
-        """
-        As a user of this image, I want to be able to import the results
-        of a Frama-C analysis to SonarQube.
-        """
-        rule_violated = "framac-rules:KERNEL.0"
-        expected_sensor = "INFO: Sensor SonarFrama-C [framac]"
-        expected_import = "INFO: Results file frama-c.csv has been found and will be processed."
-        self.import_analysis_results("Frama-C Dummy Project", "framac-dummy-project",
-            "CNES_CPP_A", "c++", "tests/c_cpp", "framac", rule_violated, expected_sensor, expected_import)
-
     def test_import_pylint_results(self):
         """
         As a user of this image, I want to be able to import the results
@@ -499,25 +456,3 @@ class TestCNESSonarScanner:
         expected_import = "INFO: Sensor PylintImportSensor [python]"
         self.import_analysis_results("Pylint Dummy Project", "pylint-dummy-project",
             "CNES_PYTHON_A", "py", "tests/python", "src", rule_violated, expected_sensor, expected_import)
-
-    def test_import_rats_results(self):
-        """
-        As a user of this image, I want to be able to import the results
-        of a RATS analysis to SonarQube.
-        """
-        rule_violated = "rats:fixed size global buffer"
-        expected_sensor = "INFO: Sensor C++ (Community) RatsSensor [cxx]"
-        expected_import = "INFO: CXX-RATS processed = 1"
-        self.import_analysis_results("RATS Dummy Project", "rats-dummy-project",
-            "CNES_CPP_A", "c++", "tests/c_cpp", "rats", rule_violated, expected_sensor, expected_import, True)
-
-    def test_import_vera_results(self):
-        """
-        As a user of this image, I want to be able to import the results
-        of a Vera++ analysis to SonarQube.
-        """
-        rule_violated = "vera++:T008"
-        expected_sensor = "INFO: Sensor C++ (Community) VeraxxSensor [cxx]"
-        expected_import = "INFO: CXX-VERA++ processed = 4"
-        self.import_analysis_results("Vera++ Dummy Project", "vera-dummy-project",
-            "CNES_CPP_A", "c++", "tests/c_cpp", "vera", rule_violated, expected_sensor, expected_import)

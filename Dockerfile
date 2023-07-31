@@ -13,25 +13,9 @@ RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >
     libpcre3-dev=2:8.39-* \
     unzip=6.0-* \
     xz-utils=5.2.5-* \
-    # for Frama-C
-    opam=2.0.8-* \
-    m4=1.4.18-* \
-    ocaml-findlib=1.8.1-* \
-    libfindlib-ocaml-dev=1.8.1-* \
-    libocamlgraph-ocaml-dev=1.8.8-* \
-    menhir=20201216-* \
-    ca-certificates
 
-# Configure Opam for Frama-C
-RUN opam init -y --disable-sandboxing \
-    && eval $(opam env)
-RUN opam install -y depext \
-    && opam depext -y frama-c \
-    && opam install -y --deps-only frama-c
-ENV PATH="/root/.opam/default/bin:$PATH"
-
-# sonar-scanner
-RUN curl -ksSLO https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip \
+    # sonar-scanner
+    RUN curl -ksSLO https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip \
     && unzip sonar-scanner-cli-4.8.0.2856-linux.zip \
     && mv /sonar-scanner-4.8.0.2856-linux /sonar-scanner
 
@@ -43,31 +27,6 @@ RUN curl -ksSLO https://github.com/danmar/cppcheck/archive/refs/tags/2.10.tar.gz
     FILESDIR="/usr/share/cppcheck" \
     HAVE_RULES="yes" \
     CXXFLAGS="-O2 -DNDEBUG -Wall -Wno-sign-compare -Wno-unused-function -Wno-deprecated-declarations"
-
-# RATS (and expat)
-RUN curl -ksSLO https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/rough-auditing-tool-for-security/rats-2.4.tgz
-RUN curl -ksSLO https://github.com/libexpat/libexpat/releases/download/R_2_0_1/expat-2.0.1.tar.gz \
-    && tar -xvzf expat-2.0.1.tar.gz \
-    && cd expat-2.0.1 \
-    && ./configure \
-    && make \
-    && make install \
-    && cd .. \
-    && tar -xzvf rats-2.4.tgz \
-    && cd rats-2.4 \
-    && ./configure --with-expat-lib=/usr/local/lib \
-    && make \
-    && make install \
-    && ./rats \
-    && cd ..
-
-# Frama-C
-RUN curl -ksSLO https://frama-c.com/download/frama-c-26.1-Iron.tar.gz \
-    && tar -zxvf frama-c-26.1-Iron.tar.gz \
-    && cd frama-c-26.1-Iron \
-    && opam exec -- make RELEASE=yes \
-    && make install \
-    && cd ..
 
 # Infer
 RUN curl -ksSLO https://github.com/facebook/infer/releases/download/v1.1.0/infer-linux64-v1.1.0.tar.xz \
@@ -124,9 +83,6 @@ COPY --from=builder /usr/share/cppcheck /usr/share/cppcheck
 COPY --from=builder /usr/bin/cppcheck /usr/bin
 COPY --from=builder /usr/bin/cppcheck-htmlreport /usr/bin
 
-# Add RATS and Frama-C from builder stage
-COPY --from=builder /usr/local /usr/local
-
 # Add Infer from builder stage
 COPY --from=builder /opt/infer-linux64-v1.1.0/bin /opt/infer-linux64-v1.1.0/bin
 COPY --from=builder /opt/infer-linux64-v1.1.0/lib /opt/infer-linux64-v1.1.0/lib
@@ -150,11 +106,6 @@ RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >
     python3-pip=20.3.4-* \
     # Shellcheck
     shellcheck=0.7.1-* \
-    # Needed by Frama-C
-    ocaml-findlib=1.8.1-* \
-    libocamlgraph-ocaml-dev=1.8.8-* \
-    libzarith-ocaml=1.11-* \
-    libyojson-ocaml=1.7.0-* \
     # Needed by Infer
     libsqlite3-0=3.34.1-* \
     libtinfo5=6.2* \

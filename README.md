@@ -241,8 +241,6 @@ sonar-scanning:
 | [pylint](http://pylint.pycqa.org/en/latest/user_guide/index.html)              | 2.17.2     | pylint-report.txt   |
 | [CNES pylint extension](https://github.com/cnescatlab/cnes-pylint-extension)   | 6.0.0      |                     |
 | [CppCheck](https://github.com/danmar/cppcheck)                                 | 2.10       | cppcheck-report.xml |
-| [RATS](https://code.google.com/archive/p/rough-auditing-tool-for-security/)    | 2.4        | rats-report.xml     |
-| [Frama-C](https://frama-c.com/index.html)                                      | 26.1-Iron  |                     |
 | [Infer](https://fbinfer.com/)                                                  | 1.1.0      |                     |
 
 ## Developer's guide
