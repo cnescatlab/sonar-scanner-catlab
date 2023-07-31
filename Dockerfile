@@ -12,10 +12,10 @@ RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >
     python3=3.9.2-* \
     libpcre3-dev=2:8.39-* \
     unzip=6.0-* \
-    xz-utils=5.2.5-* \
+    xz-utils=5.2.5-*
 
-    # sonar-scanner
-    RUN curl -ksSLO https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip \
+# sonar-scanner
+RUN curl -ksSLO https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip \
     && unzip sonar-scanner-cli-4.8.0.2856-linux.zip \
     && mv /sonar-scanner-4.8.0.2856-linux /sonar-scanner
 
@@ -100,7 +100,7 @@ RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >
     && mkdir -p /usr/share/man/man1 \
     && apt-get install -y --no-install-recommends \
     # Needed by sonar-scanner
-    openjdk-11-jre-headless=11.0.16* \
+    openjdk-11-jre-headless=11.0.18* \
     # Needed by Pylint
     python3=3.9.2-* \
     python3-pip=20.3.4-* \
