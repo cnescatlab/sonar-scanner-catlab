@@ -15,9 +15,9 @@ RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >
     xz-utils=5.2.5-*
 
 # sonar-scanner
-RUN curl -ksSLO https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip \
-    && unzip sonar-scanner-cli-4.8.0.2856-linux.zip \
-    && mv /sonar-scanner-4.8.0.2856-linux /sonar-scanner
+RUN curl -ksSLO https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856.zip \
+    && unzip sonar-scanner-cli-4.8.0.2856.zip \
+    && mv /sonar-scanner-4.8.0.2856 /sonar-scanner
 
 # CppCheck
 RUN curl -ksSLO https://github.com/danmar/cppcheck/archive/refs/tags/2.10.tar.gz \
@@ -71,10 +71,8 @@ RUN addgroup sonar-scanner \
     "$SRC_DIR"
 
 # Add sonar-scanner from builder
-COPY --from=builder /sonar-scanner/bin/sonar-scanner \
-    "$SONAR_SCANNER_HOME/bin"
-COPY --from=builder /sonar-scanner/lib \
-    "$SONAR_SCANNER_HOME/lib"
+COPY --from=builder /sonar-scanner/bin/sonar-scanner "$SONAR_SCANNER_HOME/bin"
+COPY --from=builder /sonar-scanner/lib "$SONAR_SCANNER_HOME/lib"
 # and our default sonar-scanner.properties
 COPY conf/sonar-scanner.properties "$SONAR_SCANNER_HOME/conf"
 
@@ -100,7 +98,7 @@ RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >
     && mkdir -p /usr/share/man/man1 \
     && apt-get install -y --no-install-recommends \
     # Needed by sonar-scanner
-    openjdk-11-jre-headless=11.0.18* \
+    openjdk-17-jre=17.0.* \
     # Needed by Pylint
     python3=3.9.2-* \
     python3-pip=20.3.4-* \
@@ -140,7 +138,7 @@ RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >
 ENV PYTHONPATH="$PYTHONPATH:/opt/python/cnes-pylint-extension-6.0.0/checkers" \
     PATH="$SONAR_SCANNER_HOME/bin:/usr/local/bin:$PATH" \
     PYLINTHOME="$SONAR_SCANNER_HOME/.pylint.d" \
-    JAVA_HOME="/usr/lib/jvm/java-11-openjdk-amd64"
+    JAVA_HOME="/usr/lib/jvm/java-17-openjdk-amd64"
 
 # Switch to an unpriviledged user
 USER sonar-scanner
