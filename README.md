@@ -75,9 +75,9 @@ For information on how to use these tools, refer to their official documentation
 
 There are 3 _pylintrc_ embedded in the image under `/opt/python`:
 
-- `pylintrc_RNC_sonar_2017_A_B`
-- `pylintrc_RNC_sonar_2017_C`
-- `pylintrc_RNC_sonar_2017_D`
+- `pylintrc_RNC2015_A_B`
+- `pylintrc_RNC2015_C`
+- `pylintrc_RNC2015_D`
 
 To use one of these files when running `pylint` from within the container:
 
@@ -88,7 +88,7 @@ $ docker run \
         -u "$(id -u):$(id -g)" \
         -v "$(pwd):/usr/src" \
         lequal/sonar-scanner \
-        pylint --rcfile=/opt/python/pylintrc_RNC_sonar_2017_A_B my-script.py
+        pylint --rcfile=/opt/python/pylintrc_RNC2015_A_B my-script.py
 # where my-script.py is a python module in the current working directory
 ```
 
