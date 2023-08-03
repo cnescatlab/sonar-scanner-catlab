@@ -1,5 +1,18 @@
 [
     {
+        "type": "refactor",
+        "module": "simplecaesar",
+        "obj": "",
+        "line": 1,
+        "column": 0,
+        "endLine": null,
+        "endColumn": null,
+        "path": "tests/python/src/simplecaesar.py",
+        "symbol": "too-few-comments",
+        "message": "Too few comments (14.29/30 %)",
+        "message-id": "R5201"
+    },
+    {
         "type": "convention",
         "module": "simplecaesar",
         "obj": "",
