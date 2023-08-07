@@ -39,9 +39,9 @@ RUN curl -ksSLO https://downloads.sourceforge.net/project/cppcheck/cppcheck/1.90
             CXXFLAGS="-O2 -DNDEBUG -Wall -Wno-sign-compare -Wno-unused-function -Wno-deprecated-declarations"
 # RATS (and expat)
 RUN curl -ksSLO https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/rough-auditing-tool-for-security/rats-2.4.tgz \
-    && curl -ksSLO https://sourceforge.net/projects/expat/files/expat/2.0.1/expat-2.0.1-RENAMED-VULNERABLE-PLEASE-USE-2.3.0-INSTEAD.tar.gz \
-    && tar -xvzf expat-2.0.1-RENAMED-VULNERABLE-PLEASE-USE-2.3.0-INSTEAD.tar.gz \
-    && cd expat-2.0.1 \
+    && curl -ksSLO https://sourceforge.net/projects/expat/files/expat/2.4.1/expat-2.4.1.tar.gz \
+    && tar -xvzf expat-2.4.1.tar.gz \
+    && cd expat-2.4.1 \
     && ./configure \
     && make \
     && make install \
@@ -80,6 +80,10 @@ ENV SRC_DIR=/usr/src \
 # Same workdir as the offical sonar-scanner image
 WORKDIR ${SRC_DIR}
 
+# Add hadolint from builder stage
+COPY --from=builder /hadolint /opt
+RUN chmod 777 /opt/hadolint
+
 # Add an unprivileged user
 RUN addgroup sonar-scanner \
     && adduser \
@@ -98,14 +102,11 @@ RUN addgroup sonar-scanner \
             "$SONAR_SCANNER_HOME/.sonar" \
             "$SONAR_SCANNER_HOME/.pylint.d" \
             "$SRC_DIR" \
+            "/opt/hadolint" \
     && chmod -R 777 \
             "$SONAR_SCANNER_HOME/.sonar" \
             "$SONAR_SCANNER_HOME/.pylint.d" \
             "$SRC_DIR"
-
-# Add hadolint from builder stage
-COPY --from=builder /hadolint /opt
-RUN chmod 755 /opt/hadolint
 
 # Add sonar-scanner from builder
 COPY --from=builder /sonar-scanner/bin/sonar-scanner \
