@@ -2,7 +2,7 @@
 
 ![](https://github.com/cnescatlab/sonar-scanner/workflows/CI/badge.svg)
 ![](https://github.com/cnescatlab/sonar-scanner/workflows/CD/badge.svg)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/f5f71dea84ce4020ab15a99fc841a696)](https://www.codacy.com/gh/cnescatlab/sonar-scanner?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=lequal/sonar-scanner&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/f5f71dea84ce4020ab15a99fc841a696)](https://www.codacy.com/gh/cnescatlab/sonar-scanner?utm_source=github.com&utm_medium=referral&utm_content=lequal/sonar-scanner&utm_campaign=Badge_Grade)
 
 > Docker environment containing open source code analysis tools configured by CNES and dedicated to Continuous Integration.
 
@@ -20,39 +20,39 @@ Compared to the official [sonarsource/sonar-scanner-cli](https://hub.docker.com/
 
 Additional features are:
 
-* Embedded tools
-    * see the [list](#analysis-tools-included)
-* Configuration files
-    * [pylintrc](#how-to-use-embedded-CNES-pylintrc)
+- Embedded tools
+  - see the [list](#analysis-tools-included)
+- Configuration files
+  - [pylintrc](#how-to-use-embedded-CNES-pylintrc)
 
 _This image is made to be used in conjunction with a pre-configured SonarQube server image that embeds all necessary plugins and configuration: [cnescatlab/sonarqube](https://github.com/cnescatlab/sonarqube). It is, however, not mandatory to use it._
 
 ## User guide
 
 1. Write a `sonar-project.properties` at the root of your project
-    * For information on what to write in it, see the [official SonarQube documentation](https://docs.sonarqube.org/7.9/analysis/analysis-parameters/)
+   - For information on what to write in it, see the [official SonarQube documentation](https://docs.sonarqube.org/7.9/analysis/analysis-parameters/)
 1. Execute the sonar-scanner on the project by running this image from the root of the project
-    ```sh
-    $ docker run \
-            --rm \
-            -u "$(id -u):$(id -g)" \
-            -e SONAR_HOST_URL="url of your SonarQube instance" \
-            -v "$(pwd):/usr/src" \
-            lequal/sonar-scanner
-    ```
-    This docker command is equivalent to `sonar-scanner -Dsonar.host.url="url of your SonarQube instance"`.
-    * If the SonarQube server is running in a container on the same computer, you will need to connect both containers (server and client) to the same bridge so that they can communicate. To do so:
-      ```sh
-      $ docker network create -d bridge sonarbridge
-      $ docker network connect sonarbridge "name of your sonarqube container"
-      # add the following option to the command line when running the lequal/sonar-scanner
-      --net sonarbridge
-      ```
+   ```sh
+   $ docker run \
+           --rm \
+           -u "$(id -u):$(id -g)" \
+           -e SONAR_HOST_URL="url of your SonarQube instance" \
+           -v "$(pwd):/usr/src" \
+           lequal/sonar-scanner
+   ```
+   This docker command is equivalent to `sonar-scanner -Dsonar.host.url="url of your SonarQube instance"`.
+   - If the SonarQube server is running in a container on the same computer, you will need to connect both containers (server and client) to the same bridge so that they can communicate. To do so:
+     ```sh
+     $ docker network create -d bridge sonarbridge
+     $ docker network connect sonarbridge "name of your sonarqube container"
+     # add the following option to the command line when running the lequal/sonar-scanner
+     --net sonarbridge
+     ```
 
 This image suffers from the same limitations as the official SonarQube [sonarsource/sonar-scanner-cli](https://hub.docker.com/r/sonarsource/sonar-scanner-cli) image.
 
-* If you need to analyze .NET projects, you must use the SonarScanner for MSBuild.
-* If you want to save the sonar-scanner cache, you must create the directory to bind mount in the container before running it. For more information, see [SonarQube documentation](https://docs.sonarqube.org/8.4/analysis/scan/sonarscanner/#header-6).
+- If you need to analyze .NET projects, you must use the SonarScanner for MSBuild.
+- If you want to save the sonar-scanner cache, you must create the directory to bind mount in the container before running it. For more information, see [SonarQube documentation](https://docs.sonarqube.org/8.4/analysis/scan/sonarscanner/#header-6).
 
 ### How to use embedded tools
 
@@ -75,9 +75,9 @@ For information on how to use these tools, refer to their official documentation
 
 There are 3 _pylintrc_ embedded in the image under `/opt/python`:
 
-* `pylintrc_RNC_sonar_2017_A_B`
-* `pylintrc_RNC_sonar_2017_C`
-* `pylintrc_RNC_sonar_2017_D`
+- `pylintrc_RNC2015_A_B`
+- `pylintrc_RNC2015_C`
+- `pylintrc_RNC2015_D`
 
 To use one of these files when running `pylint` from within the container:
 
@@ -88,7 +88,7 @@ $ docker run \
         -u "$(id -u):$(id -g)" \
         -v "$(pwd):/usr/src" \
         lequal/sonar-scanner \
-        pylint --rcfile=/opt/python/pylintrc_RNC_sonar_2017_A_B my-script.py
+        pylint --rcfile=/opt/python/pylintrc_RNC2015_A_B my-script.py
 # where my-script.py is a python module in the current working directory
 ```
 
@@ -204,11 +204,11 @@ cache:
 script:
   - mkdir -p /home/travis/.sonarcache
   - docker run --rm \
-        -u "$(id -u):$(id -g)" \
-        -e SONAR_HOST_URL="https://my-sonarqube.com" \
-        -v "$(pwd):/usr/src" \
-        -v "/home/travis/.sonarcache:/opt/sonar-scanner/.sonar/cache" \
-        lequal/sonar-scanner
+    -u "$(id -u):$(id -g)" \
+    -e SONAR_HOST_URL="https://my-sonarqube.com" \
+    -v "$(pwd):/usr/src" \
+    -v "/home/travis/.sonarcache:/opt/sonar-scanner/.sonar/cache" \
+    lequal/sonar-scanner
 ```
 
 #### GitLab-CI
@@ -225,26 +225,23 @@ sonar-scanning:
   script:
     - mkdir -p .sonarcache
     - docker run --rm \
-              -u "$(id -u):$(id -g)" \
-              -e SONAR_HOST_URL="https://my-sonarqube.com" \
-              -v "$(pwd):/usr/src" \
-              -v ".sonarcache:/opt/sonar-scanner/.sonar/cache" \
-              lequal/sonar-scanner
+      -u "$(id -u):$(id -g)" \
+      -e SONAR_HOST_URL="https://my-sonarqube.com" \
+      -v "$(pwd):/usr/src" \
+      -v ".sonarcache:/opt/sonar-scanner/.sonar/cache" \
+      lequal/sonar-scanner
 ```
 
 ## Analysis tools included
 
-| Tool                                                                           | Version       | Default report file |
-|--------------------------------------------------------------------------------|---------------|---------------------|
-| [sonar-scanner](https://docs.sonarqube.org/latest/analysis/scan/sonarscanner/) | 4.4.0.2170    |                     |
-| [ShellCheck](https://github.com/koalaman/shellcheck)                           | 0.7.1         |                     |
-| [pylint](http://pylint.pycqa.org/en/latest/user_guide/index.html)              | 2.5.0         | pylint-report.txt   |
-| [CNES pylint extension](https://github.com/cnescatlab/cnes-pylint-extension)   | 5.0.0         |                     |
-| [CppCheck](https://github.com/danmar/cppcheck)                                 | 1.90          | cppcheck-report.xml |
-| [Vera++](https://bitbucket.org/verateam/vera/wiki/Home)                        | 1.2.1         | vera-report.xml     |
-| [RATS](https://code.google.com/archive/p/rough-auditing-tool-for-security/)    | 2.4           | rats-report.xml     |
-| [Frama-C](https://frama-c.com/index.html)                                      | 20.0          |                     |
-| [Infer](https://fbinfer.com/)                                                  | 0.17.0        |                     |
+| Tool                                                                           | Version    | Default report file |
+| ------------------------------------------------------------------------------ | ---------- | ------------------- |
+| [sonar-scanner](https://docs.sonarqube.org/latest/analysis/scan/sonarscanner/) | 4.8.0.2856 |                     |
+| [ShellCheck](https://github.com/koalaman/shellcheck)                           | 0.7.1      |                     |
+| [pylint](http://pylint.pycqa.org/en/latest/user_guide/index.html)              | 2.17.2     | pylint-report.txt   |
+| [CNES pylint extension](https://github.com/cnescatlab/cnes-pylint-extension)   | 6.0.0      |                     |
+| [CppCheck](https://github.com/danmar/cppcheck)                                 | 2.10       | cppcheck-report.xml |
+| [Infer](https://fbinfer.com/)                                                  | 1.1.0      |                     |
 
 ## Developer's guide
 
@@ -265,7 +262,7 @@ To run the tests and create your own ones see the [test documentation](https://g
 
 ## How to contribute
 
-If you experienced a problem with the image please open an issue. Inside this issue please explain us how to reproduce this issue and paste the log. 
+If you experienced a problem with the image please open an issue. Inside this issue please explain us how to reproduce this issue and paste the log.
 
 If you want to do a PR, please put inside of it the reason of this pull request. If this pull request fixes an issue please insert the number of the issue or explain inside of the PR how to reproduce this issue.
 
