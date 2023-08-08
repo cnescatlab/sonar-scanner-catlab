@@ -119,7 +119,7 @@ class TestCNESSonarScanner:
                                                 "login": "admin"
                                             })
         cls.SONARQUBE_TOKEN = sonarqube_token.json()["token"]
-    
+
     @classmethod
     def wait_cnes_sonarqube_ready(cls, container_name: str, tail = "all"):
         """
