@@ -76,7 +76,7 @@ class TestCNESSonarScanner:
                 network=cls.SONARQUBE_NETWORK)
         else:
             print(f"Using container {cls.SONARQUBE_CONTAINER_NAME} and network {cls.SONARQUBE_NETWORK}")
-       
+
         # Create cache folder for sonar-scanner
         cache_dir_path = os.path.join(cls._PROJECT_ROOT_DIR, '.sonarcache')
         if not os.path.exists(cache_dir_path):
@@ -85,7 +85,7 @@ class TestCNESSonarScanner:
         print(f"Waiting for {cls.SONARQUBE_CONTAINER_NAME} to be up...")
         cls.wait_cnes_sonarqube_ready(cls.SONARQUBE_CONTAINER_NAME)
         # Retrieve the token
-        cls.get_sonarqube_token(cls)
+        cls.get_sonarqube_token()
 
     @classmethod
     def teardown_class(cls):
