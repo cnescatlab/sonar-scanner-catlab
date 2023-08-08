@@ -53,7 +53,7 @@ class TestCNESSonarScanner:
     _SONAR_SCANNER_IMAGE = "lequal/sonar-scanner"
     _PROJECT_ROOT_DIR = str(Path(os.getcwd()).parent)
     SONARQUBE_TOKEN = ""
-    
+
     # Setup and Teardown
     @classmethod
     def setup_class(cls):
@@ -106,7 +106,11 @@ class TestCNESSonarScanner:
             docker_client.networks.get(cls.SONARQUBE_NETWORK).remove()
 
     # Functions
+    @classmethod
     def get_sonarqube_token(cls):
+        """
+        Retrieve SonarQube token with global analysis from the server
+        """
         sonarqube_token = requests.post(f"{cls.SONARQUBE_LOCAL_URL}/api/user_tokens/generate",
                                             auth=("admin", cls.SONARQUBE_ADMIN_PASSWORD),
                                             params={
@@ -206,7 +210,8 @@ class TestCNESSonarScanner:
                         auth=("admin", cls.SONARQUBE_ADMIN_PASSWORD)).json()
         # Hint: if this test fails, the project is not on the server
         assert output['components'][0]['key'] == project_key
-        # Hint: if this test fails, there should be {nb_issues issues} on the {language_name} dummy project with the Sonar way QP but {len(issues)} were found
+        # Hint: if this test fails, there should be {nb_issues issues} on the {language_name}
+        # dummy project with the Sonar way QP but {len(issues)} were found
         assert get_number_of_issues() == nb_issues
         print("Analysis with Sonar way QP ran as expected.")
         # If the language has a specific CNES Quality Profile, it must also be tested
