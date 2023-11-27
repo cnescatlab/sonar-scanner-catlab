@@ -8,6 +8,7 @@ RUN echo 'deb http://ftp.fr.debian.org/debian/ bullseye main contrib non-free' >
     curl=7.74.0-* \
     # for C/C++ tools
     make=4.3-* \
+    nodejs=12.22.12 \
     g\+\+=4:10.2.1-* \
     python3=3.9.2-* \
     libpcre3-dev=2:8.39-* \
