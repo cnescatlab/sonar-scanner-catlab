@@ -72,7 +72,7 @@ $ pip install -r requirements.txt
              -p 9000:9000 \
              -e SONARQUBE_ADMIN_PASSWORD=adminpassword \
              --net sonarbridge \
-             lequal/sonarqube:latest
+             lequal/sonarqube-catlab:latest
      ```
 
 - Wait until it is configured
