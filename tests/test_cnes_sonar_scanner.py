@@ -18,27 +18,27 @@ import requests
 class TestCNESSonarScanner:
     """
     This class test the lequal/sonar-scanner image.
-    It runs a container of the lequal/sonarqube image and run analysis with
+    It runs a container of the lequal/sonarqube-catlab image and run analysis with
     lequal/sonar-scanner.
     It does not build any image.
     Tests can be parametered with environment variables.
 
     Environment variables:
-        RUN: whether or not to run a lequal/sonarqube container and create a
+        RUN: whether or not to run a lequal/sonarqube-catlab container and create a
              bridge network, default "yes", if you already have a running
              container, set it to "no" and provide information through the
              other variables.
         SONARQUBE_CONTAINER_NAME: the name to give to the container running
-                                  the lequal/sonarqube image.
+                                  the lequal/sonarqube-catlab image.
         SONARQUBE_ADMIN_PASSWORD: the password of the admin account on the server.
-        SONARQUBE_URL: URL of lequal/sonarqube container if already running
+        SONARQUBE_URL: URL of lequal/sonarqube-catlab container if already running
                         without trailing / from the scanner container.
                         e.g. http://mycontainer:9000
                         Use it only if no container name was given.
-        SONARQUBE_LOCAL_URL: URL of lequal/sonarqube container if already running
+        SONARQUBE_LOCAL_URL: URL of lequal/sonarqube-catlab container if already running
                             without trailing / from the host.
                             e.g. http://localhost:9000
-        SONARQUBE_TAG: the tag of the lequal/sonarqube image to use.
+        SONARQUBE_TAG: the tag of the lequal/sonarqube-catlab image to use.
                         e.g. latest
         SONARQUBE_NETWORK: the name of the docker bridge used.
     """
@@ -59,15 +59,15 @@ class TestCNESSonarScanner:
     def setup_class(cls):
         """
         Set up the tests
-        Launch a lequal/sonarqube container and wait for it to be up
+        Launch a lequal/sonarqube-catlab container and wait for it to be up
         """
         docker_client = docker.from_env()
         # Launch a CNES SonarQube container
         if cls.RUN:
             print(f"Creating bridge network (name={cls.SONARQUBE_NETWORK})...")
             docker_client.networks.create(cls.SONARQUBE_NETWORK)
-            print(f"Launching lequal/sonarqube container (name={cls.SONARQUBE_CONTAINER_NAME})...")
-            docker_client.containers.run(f"lequal/sonarqube:{cls.SONARQUBE_TAG}",
+            print(f"Launching lequal/sonarqube-catlab container (name={cls.SONARQUBE_CONTAINER_NAME})...")
+            docker_client.containers.run(f"lequal/sonarqube-catlab:{cls.SONARQUBE_TAG}",
                 name=cls.SONARQUBE_CONTAINER_NAME,
                 detach=True,
                 auto_remove=True,
@@ -126,7 +126,7 @@ class TestCNESSonarScanner:
         This function waits for SonarQube to be configured by
         the configure.bash script.
 
-        :param container_name: name of the container running lequal/sonarqube
+        :param container_name: name of the container running lequal/sonarqube-catlab
         :param tail: forwarded to docker logs
         """
         docker_client = docker.from_env()

@@ -64,7 +64,7 @@ jobs:
       # Run the tests (with the appropriate server image)
       - name: Test docker image
         run: |
-          echo "Retrieving the sonarqube image..."
+          echo "Retrieving the sonarqube-catlab image..."
           docker pull lequal/sonarqube-catlab:latest
           echo "Testing the scanner image..."
           echo -e "Results of the CI pipeline\n" > tests_logs.txt
