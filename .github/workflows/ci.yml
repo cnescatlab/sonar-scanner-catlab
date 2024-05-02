@@ -25,13 +25,13 @@ on:
 env:
   DOCKERFILE_PATH: '.'
   DOCKERFILE_FILENAME: 'Dockerfile'
-  DOCKER_IMAGE_NAME: 'lequal/sonar-scanner'
+  DOCKER_IMAGE_NAME: 'lequal/sonar-scanner-catlab'
 
 jobs:
   # Job that builds the image and upload it as an artifact
   build:
     name: Build the docker image
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v2
       - name: Build docker image
@@ -46,7 +46,7 @@ jobs:
   # Jobs that test the image and the embedded tools
   test:
     name: Test the Docker image
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     needs: build
     steps:
       - uses: actions/checkout@v2

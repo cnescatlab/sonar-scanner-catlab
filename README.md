@@ -1,15 +1,15 @@
-# CNES sonar-scanner image
+# CNES sonar-scanner-catlab image
 
 ![](https://github.com/cnescatlab/sonar-scanner/workflows/CI/badge.svg)
 ![](https://github.com/cnescatlab/sonar-scanner/workflows/CD/badge.svg)
 
 > Docker environment containing open source code analysis tools configured by CNES and dedicated to Continuous Integration.
 
-This image is a pre-configured sonar-scanner image derived from [Docker-CAT](https://github.com/cnescatlab/docker-cat). It contains the same tools for code analysis and it is available on Docker Hub at [lequal/sonar-scanner](https://hub.docker.com/r/lequal/sonar-scanner/).
+This image is a pre-configured sonar-scanner image derived from [Docker-CAT](https://github.com/cnescatlab/docker-cat). It contains the same tools for code analysis and it is available on Docker Hub at [lequal/sonar-scanner](https://hub.docker.com/r/lequal/sonar-scanner-catlab/).
 
 SonarQube itself is an opensource project on GitHub: [SonarSource/sonarqube](https://github.com/SonarSource/sonarqube).
 
-For versions and changelog: [GitHub Releases](https://github.com/cnescatlab/sonar-scanner/releases).
+For versions and changelog: [GitHub Releases](https://github.com/cnescatlab/sonar-scanner-catlab/releases).
 
 :information_source: If you only need a containerized `sonar-scanner`, you better use the official image from SonarSource available on Docker Hub: [sonarsource/sonar-scanner-cli](https://hub.docker.com/r/sonarsource/sonar-scanner-cli). The official image is smaller because it does not embed any other tool.
 
@@ -24,13 +24,13 @@ Additional features are:
 - Configuration files
   - [pylintrc](#how-to-use-embedded-CNES-pylintrc)
 
-_This image is made to be used in conjunction with a pre-configured SonarQube server image that embeds all necessary plugins and configuration: [cnescatlab/sonarqube](https://github.com/cnescatlab/sonarqube). It is, however, not mandatory to use it._
+_This image is made to be used in conjunction with a pre-configured SonarQube server image that embeds all necessary plugins and configuration: [cnescatlab/sonarqube](https://github.com/cnescatlab/sonarqube-catlab). It is, however, not mandatory to use it._
 
 ## User guide
 
 1. Write a `sonar-project.properties` at the root of your project
-   - For information on what to write in it, see the [official SonarQube documentation](https://docs.sonarqube.org/7.9/analysis/analysis-parameters/)
-1. Execute the sonar-scanner on the project by running this image from the root of the project
+   - For information on what to write in it, see the [official SonarQube documentation](https://docs.sonarqube.org/sonarqube/9.9/)
+2. Execute the sonar-scanner on the project by running this image from the root of the project
    ```sh
    $ docker run \
            --rm \
@@ -51,7 +51,7 @@ _This image is made to be used in conjunction with a pre-configured SonarQube se
 This image suffers from the same limitations as the official SonarQube [sonarsource/sonar-scanner-cli](https://hub.docker.com/r/sonarsource/sonar-scanner-cli) image.
 
 - If you need to analyze .NET projects, you must use the SonarScanner for MSBuild.
-- If you want to save the sonar-scanner cache, you must create the directory to bind mount in the container before running it. For more information, see [SonarQube documentation](https://docs.sonarqube.org/8.4/analysis/scan/sonarscanner/#header-6).
+- If you want to save the sonar-scanner cache, you must create the directory to bind mount in the container before running it. For more information, see [SonarQube documentation](https://docs.sonarqube.org/sonarqube/9.9/).
 
 ### How to use embedded tools
 
