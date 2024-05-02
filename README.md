@@ -1,8 +1,7 @@
-# CNES sonar-scanner image \[client\]
+# CNES sonar-scanner image
 
 ![](https://github.com/cnescatlab/sonar-scanner/workflows/CI/badge.svg)
 ![](https://github.com/cnescatlab/sonar-scanner/workflows/CD/badge.svg)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/f5f71dea84ce4020ab15a99fc841a696)](https://www.codacy.com/gh/cnescatlab/sonar-scanner?utm_source=github.com&utm_medium=referral&utm_content=lequal/sonar-scanner&utm_campaign=Badge_Grade)
 
 > Docker environment containing open source code analysis tools configured by CNES and dedicated to Continuous Integration.
 
@@ -236,11 +235,11 @@ sonar-scanning:
 
 | Tool                                                                           | Version    | Default report file |
 | ------------------------------------------------------------------------------ | ---------- | ------------------- |
-| [sonar-scanner](https://docs.sonarqube.org/latest/analysis/scan/sonarscanner/) | 4.8.0.2856 |                     |
-| [ShellCheck](https://github.com/koalaman/shellcheck)                           | 0.7.1      |                     |
-| [pylint](http://pylint.pycqa.org/en/latest/user_guide/index.html)              | 2.17.2     | pylint-report.txt   |
-| [CNES pylint extension](https://github.com/cnescatlab/cnes-pylint-extension)   | 6.0.0      |                     |
-| [CppCheck](https://github.com/danmar/cppcheck)                                 | 2.10       | cppcheck-report.xml |
+| [sonar-scanner](https://docs.sonarqube.org/latest/analysis/scan/sonarscanner/) | 5.0.1.3006 |                     |
+| [ShellCheck](https://github.com/koalaman/shellcheck)                           | 0.8.0      |                     |
+| [pylint](http://pylint.pycqa.org/en/latest/user_guide/index.html)              | 3.1.0      | pylint-report.txt   |
+| [CNES pylint extension](https://github.com/cnescatlab/cnes-pylint-extension)   | 7.0.0      |                     |
+| [CppCheck](https://github.com/danmar/cppcheck)                                 | 2.14.0     | cppcheck-report.xml |
 | [Infer](https://fbinfer.com/)                                                  | 1.1.0      |                     |
 
 ## Developer's guide
