@@ -25,62 +25,47 @@ on:
 env:
   DOCKERFILE_PATH: '.'
   DOCKERFILE_FILENAME: 'Dockerfile'
-  DOCKER_IMAGE_NAME: 'lequal/sonar-scanner'
+  DOCKER_IMAGE_NAME: 'lequal/sonar-scanner-catlab'
 
 jobs:
   # Job that builds the image and upload it as an artifact
   build:
     name: Build the docker image
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Build docker image
         run: docker build -t $DOCKER_IMAGE_NAME $DOCKERFILE_PATH
       - name: Save Docker image
         run: docker image save -o image.tar $DOCKER_IMAGE_NAME
       - name: Upload image as an artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: image
           path: image.tar
   # Jobs that test the image and the embedded tools
   test:
     name: Test the Docker image
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs: build
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Retrieve the image
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: image
       - name: Load the image
         run: docker image load -i image.tar
       - name: Cache sonar-scanner data
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: .sonarcache
           key: sonar-scanner-cache
       # Run the tests (with the appropriate server image)
       - name: Test docker image
         run: |
-          echo "Retrieving the branch name..."
-          if [ "${{ github.event_name }}" = "push" ]
-          then
-            branch=${{ github.ref }}
-            branch=${branch#*/}
-            branch=${branch#*/}
-          else # PR
-            branch=${{ github.head_ref }}
-          fi
-          echo "Cloning the server repo on branch $branch..."
-          if ! git clone https://github.com/cnescatlab/sonarqube.git -b "$branch" tmpserver;
-          then
-            echo "No branch $branch found on the server repository, using develop"
-            git clone https://github.com/cnescatlab/sonarqube.git -b develop tmpserver
-          fi
-          echo "Building the server image..."
-          docker build -t lequal/sonarqube:latest tmpserver/
+          echo "Retrieving the sonarqube-catlab image..."
+          docker pull lequal/sonarqube-catlab:latest
           echo "Testing the scanner image..."
           echo -e "Results of the CI pipeline\n" > tests_logs.txt
           cd tests/

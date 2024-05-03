@@ -24,13 +24,13 @@ on:
 env:
   DOCKERFILE_PATH: "."
   DOCKERFILE_FILENAME: "Dockerfile"
-  DOCKER_IMAGE_NAME: "lequal/sonar-scanner"
+  DOCKER_IMAGE_NAME: "lequal/sonar-scanner-catlab"
 
 jobs:
   # Job to test if a new version is ready to be released
   deliverability:
     name: Check if a new version must be released
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     # The job is run only if the CI workflow succeeded
     if: github.event.workflow_run.conclusion == 'success'
     outputs:
@@ -48,7 +48,7 @@ jobs:
           if [ "$milestones" == "[]" ]
           then
             echo No milestone completed, not delivering
-            echo "::set-output name=delivery::forbidden"
+            echo "delivery=forbidden" >> $GITHUB_OUTPUT
             exit 0
           fi
           echo -e "Completed milestones:\n$milestones"
@@ -62,17 +62,18 @@ jobs:
             exit 1
           fi
           echo Ready to deliver
-          echo "::set-output name=version::$version"
-          echo "::set-output name=milestone_number::$milestone_number"
-          echo "::set-output name=delivery::allowed"
+          echo "version=$version" >> $GITHUB_OUTPUT
+          echo "milestone_number=$milestone_number" >> $GITHUB_OUTPUT
+          echo "delivery=allowed" >> $GITHUB_OUTPUT
+
   release:
     name: Release a new version of the docker image
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs: deliverability
     if: needs.deliverability.outputs.delivery == 'allowed'
     steps:
       # git clone
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       # Merge develop into master (fast forward) and tag master
@@ -91,7 +92,7 @@ jobs:
         run: |
           tags=($(git tag --sort="-v:refname" | grep -P -e '[0-9]+\.[0-9]+\.[0-9]+'))
           echo The tag of the previous release is ${tags[1]}
-          echo "::set-output name=tag::${tags[1]}"
+          echo "tag=${tags[1]}" >> $GITHUB_OUTPUT
       # Generate the changelog since last release
       - name: Generate the changelog
         uses: charmixer/auto-changelog-action@v1
@@ -117,7 +118,7 @@ jobs:
 
   push_to_registry:
     name: Push Docker image to Docker Hub
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs: deliverability
     if: needs.deliverability.outputs.delivery == 'allowed'
     steps:
@@ -125,19 +126,19 @@ jobs:
         uses: actions/checkout@v4
       
       - name: Log in to Docker Hub
-        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
       
       - name: Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        uses: docker/metadata-action@v5
         with:
           images: ${{ env.DOCKER_IMAGE_NAME }}
 
       - name: Build and push Docker image to version number
-        uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
+        uses: docker/build-push-action@v5
         with:
           context: .
           file: ${{ env.DOCKERFILE_PATH }}/${{ env.DOCKERFILE_FILENAME }}
@@ -145,8 +146,8 @@ jobs:
           tags: ${{ env.DOCKER_IMAGE_NAME}}:${{ needs.deliverability.outputs.version }}
           labels: ${{ steps.meta.outputs.labels }}
 
-      - name: Build and push Docker image to  lastest repo
-        uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
+      - name: Build and push Docker image to lastest repo
+        uses: docker/build-push-action@v5
         with:
           context: .
           file: ${{ env.DOCKERFILE_PATH }}/${{ env.DOCKERFILE_FILENAME }}
@@ -154,10 +155,41 @@ jobs:
           tags: ${{ env.DOCKER_IMAGE_NAME }}:latest
           labels: ${{ steps.meta.outputs.labels }}
 
+      - name: Update repo description
+        uses: peter-evans/dockerhub-description@v4
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+          repository: ${{ env.DOCKER_IMAGE_NAME }}
+
+      - name: Build and push Docker image old name to version number
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ${{ env.DOCKERFILE_PATH }}/${{ env.DOCKERFILE_FILENAME }}
+          push: true
+          tags: lequal/sonar-scanner:${{ needs.deliverability.outputs.version }}
+          labels: ${{ steps.meta.outputs.labels }}
+  
+      - name: Build and push Docker image old name to lastest repo
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ${{ env.DOCKERFILE_PATH }}/${{ env.DOCKERFILE_FILENAME }}
+          push: true
+          tags: lequal/sonar-scanner:latest
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Update old name repo description
+        uses: peter-evans/dockerhub-description@v4
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+          repository: lequal/sonar-scanner
 
   close_milestone:
     name: Close the milestone
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs:
       - deliverability
       - release
