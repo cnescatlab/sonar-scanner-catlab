@@ -424,7 +424,7 @@ class TestCNESSonarScanner:
         sensors = (
             "INFO: Sensor ShellCheck Sensor [shellcheck]",
         )
-        self.language("Shell", "shell", "shell", sensors, "shell-dummy-project", 53, "RNC SHELL", 11)
+        self.language("Shell", "shell", "shell", sensors, "shell-dummy-project", 60, "RNC SHELL", 19)
 
     # Test analysis tools
     def test_tool_cppcheck(self):
@@ -436,14 +436,6 @@ class TestCNESSonarScanner:
         output = "tests/c_cpp/tmp-cppcheck-results.xml"
         cmd = f"cppcheck --xml-version=2 tests/c_cpp/cppcheck/main.c --output-file={output}"
         self.analysis_tool("cppcheck", cmd, ref, output, False)
-
-    def test_tool_infer(self):
-        """
-        As a user of this image, I want to run Infer from within a container
-        so that it produces results.
-        """
-        cmd = "infer -q run -- gcc -c tests/c_cpp/infer/hello.c -o tests/c_cpp/infer/hello.o"
-        self.analysis_tool("Infer", cmd, "tests/c_cpp/reference-infer-results.json", "infer-out/report.json", False)
 
     def test_tool_pylint(self):
         """

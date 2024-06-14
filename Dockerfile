@@ -30,11 +30,6 @@ RUN curl -ksSLO https://github.com/danmar/cppcheck/archive/refs/tags/2.14.0.tar.
     CXXFLAGS="-O2 -DNDEBUG -Wall -Wno-sign-compare -Wno-unused-function -Wno-deprecated-declarations" \
     && rm -rf cppcheck-2.14.0 2.14.0.tar.gz
 
-# Infer
-RUN curl -ksSLO https://github.com/facebook/infer/releases/download/v1.1.0/infer-linux64-v1.1.0.tar.xz \
-    && tar -C /opt -Jxvf infer-linux64-v1.1.0.tar.xz \
-    && rm infer-linux64-v1.1.0.tar.xz
-
 ################################################################################
 
 # Final image based on the official sonar-scanner image
@@ -84,10 +79,6 @@ COPY --from=builder /usr/share/cppcheck /usr/share/cppcheck
 COPY --from=builder /usr/bin/cppcheck /usr/bin
 COPY --from=builder /usr/bin/cppcheck-htmlreport /usr/bin
 
-# Add Infer from builder stage
-COPY --from=builder /opt/infer-linux64-v1.1.0/bin /opt/infer-linux64-v1.1.0/bin
-COPY --from=builder /opt/infer-linux64-v1.1.0/lib /opt/infer-linux64-v1.1.0/lib
-
 # Add CNES pylintrc A_B, C, D
 COPY pylintrc.d/ /opt/python/
 
@@ -102,14 +93,6 @@ RUN apt update \
     python3-pip=22.0.2* \
     # Shellcheck
     shellcheck=0.8.0-* \
-    # Needed by Infer
-    libsqlite3-0=3.37.2-* \
-    python2.7=2.7.18-* \
-    # Compilation tools needed by Infer
-    gcc=4:11.2.0-* \
-    g\+\+=4:11.2.0-* \
-    clang=1:14.0-* \
-    make=4.3-* \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /usr/local/man \
     # Install pylint and CNES pylint extension
@@ -125,9 +108,7 @@ RUN apt update \
     isort==5.13.2 \
     typed-ast==1.5.5 \
     astroid==3.1.0 \
-    pylint==3.1.0 \
-    # Infer
-    && ln -s "/opt/infer-linux64-v1.1.0/bin/infer" /usr/local/bin/infer
+    pylint==3.1.0
 
 # Make sonar-scanner, CNES pylint and C/C++ tools executable
 ENV PATH="$SONAR_SCANNER_HOME/bin:/usr/local/bin:$PATH" \
