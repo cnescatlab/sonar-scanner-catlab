@@ -1,5 +1,5 @@
 """
-Automated integration test of CNES sonar-scanner
+Automated integration test of CNES sonar-scanner-catlab
 
 Run the tests by launching ``pytest`` from the "tests/" folder.
 
@@ -50,7 +50,7 @@ class TestCNESSonarScanner:
     SONARQUBE_LOCAL_URL = os.environ.get("SONARQUBE_LOCAL_URL", "http://localhost:9000")
     SONARQUBE_TAG = os.environ.get("SONARQUBE_TAG", "latest")
     SONARQUBE_NETWORK = os.environ.get("SONARQUBE_NETWORK", "sonarbridge")
-    _SONAR_SCANNER_IMAGE = "lequal/sonar-scanner"
+    _SONAR_SCANNER_IMAGE = "lequal/sonar-scanner-catlab"
     _PROJECT_ROOT_DIR = str(Path(os.getcwd()).parent)
     SONARQUBE_TOKEN = ""
 
@@ -149,7 +149,7 @@ class TestCNESSonarScanner:
         :param language_name: language name to display
         :param language_key: language key for SonarQube
         :param folder: folder name, relative to the tests/ folder
-        :param sensors_info: array of lines of sensors to look for in the scanner output
+        :param sensors_INFO  array of lines of sensors to look for in the scanner output
         :param project_key: project key (sonar.project_key of sonar-project.properties)
         :param nb_issues: number of issues with the Sonar way Quality Profile
         :param cnes_qp: (optional) name of the CNES Quality Profile to apply, if any
@@ -157,10 +157,10 @@ class TestCNESSonarScanner:
 
         Example (not a doctest):
             sensors = (
-                "INFO: Sensor CheckstyleSensor [checkstyle]",
-                "INFO: Sensor FindBugs Sensor [findbugs]",
-                "INFO: Sensor PmdSensor [pmd]",
-                "INFO: Sensor CoberturaSensor [cobertura]"
+                "INFO  Sensor CheckstyleSensor [checkstyle]",
+                "INFO  Sensor FindBugs Sensor [findbugs]",
+                "INFO  Sensor PmdSensor [pmd]",
+                "INFO  Sensor CoberturaSensor [cobertura]"
             )
             self.language("Java", "java", "java", sensors, "java-dummy-project", 3, "CNES_JAVA_A", 6)
         """
@@ -173,6 +173,8 @@ class TestCNESSonarScanner:
 
             :returns: output of the analysis
             """
+            #Print the output of docker ps -a with the container name to help debugging
+            print(docker_client.containers.list(all=True, filters={"name": cls.SONARQUBE_CONTAINER_NAME}))
             print(f"Analysing project {project_key}...")
             output = docker_client.containers.run(cls._SONAR_SCANNER_IMAGE,
                 f"-Dsonar.projectBaseDir=/usr/src/tests/{folder} -Dsonar.login={cls.SONARQUBE_TOKEN}",
@@ -202,7 +204,7 @@ class TestCNESSonarScanner:
         # Make sure all non-default for this language plugins were executed by the scanner
         for sensor_line in sensors_info:
             # Hint: if this test fails, a plugin may not be installed correctly or a sensor is not triggered when needed
-            assert sensor_line in output
+            assert any(sensor_line in line for line in output.split('\n'))
         # Wait for SonarQube to process the results
         time.sleep(8)
         # Check that the project was added to the server
@@ -293,8 +295,8 @@ class TestCNESSonarScanner:
 
         Example (not a doctest):
             rule_violated = "cppcheck:arrayIndexOutOfBounds"
-            expected_sensor = "INFO: Sensor C++ (Community) CppCheckSensor [cxx]"
-            expected_import = "INFO: CXX-CPPCHECK processed = 1"
+            expected_sensor = "INFO  Sensor C++ (Community) CppCheckSensor [cxx]"
+            expected_import = "INFO  CXX-CPPCHECK processed = 1"
             self.import_analysis_results("CppCheck Dummy Project", "cppcheck-dummy-project",
                 "CNES_C_A", "c++", "tests/c_cpp", "cppcheck", rule_violated, expected_sensor, expected_import)
         """
@@ -370,7 +372,7 @@ class TestCNESSonarScanner:
         so that I can see its level of quality on the SonarQube server.
         """
         sensors = (
-            "INFO: Sensor CXX [cxx]",
+            "INFO  Sensor CXX [cxx]",
         )
         self.language("C/C++", "cxx", "c_cpp", sensors, "c-dummy-project", 0, "RNC C A", 0)
         # 0 issue are expected with the Sonar way Quality Profile for
@@ -382,7 +384,7 @@ class TestCNESSonarScanner:
         so that I can see its level of quality on the SonarQube server.
         """
         sensors = (
-            "INFO: Sensor Sonar i-Code [icode]",
+            "INFO  Sensor Sonar i-Code [icode]",
         )
         self.language("Fortran 77", "f77", "fortran77", sensors, "fortran77-dummy-project", 11)
 
@@ -392,7 +394,7 @@ class TestCNESSonarScanner:
         so that I can see its level of quality on the SonarQube server.
         """
         sensors = (
-            "INFO: Sensor Sonar i-Code [icode]",
+            "INFO  Sensor Sonar i-Code [icode]",
         )
         self.language("Fortran 90", "f90", "fortran90", sensors, "fortran90-dummy-project", 14)
 
@@ -402,10 +404,10 @@ class TestCNESSonarScanner:
         so that I can see its level of quality on the SonarQube server.
         """
         sensors = (
-            "INFO: Sensor CheckstyleSensor [checkstyle]",
-            "INFO: Sensor FindBugs Sensor [findbugs]",
-            "INFO: Sensor PmdSensor [pmd]",
-            "INFO: Sensor CoberturaSensor [cobertura]"
+            "INFO  Sensor CheckstyleSensor [checkstyle]",
+            "INFO  Sensor FindBugs Sensor [findbugs]",
+            "INFO  Sensor PmdSensor [pmd]",
+            "INFO  Sensor CoberturaSensor [cobertura]"
         )
         self.language("Java", "java", "java", sensors, "java-dummy-project", 3, "RNC A", 6)
 
@@ -422,7 +424,7 @@ class TestCNESSonarScanner:
         so that I can see its level of quality on the SonarQube server.
         """
         sensors = (
-            "INFO: Sensor ShellCheck Sensor [shellcheck]",
+            "INFO  Sensor ShellCheck Sensor [shellcheck]",
         )
         self.language("Shell", "shell", "shell", sensors, "shell-dummy-project", 60, "RNC SHELL", 19)
 
@@ -460,8 +462,8 @@ class TestCNESSonarScanner:
         of a CppCheck analysis to SonarQube.
         """
         rule_violated = "cppcheck:arrayIndexOutOfBounds"
-        expected_sensor = "INFO: Sensor CXX [cxx]"
-        expected_import = "INFO: Sensor CXX Cppcheck report import"
+        expected_sensor = "INFO  Sensor CXX [cxx]"
+        expected_import = "INFO  Sensor CXX Cppcheck report import"
         self.import_analysis_results("CppCheck Dummy Project", "cppcheck-dummy-project",
             "RNC CPP A", "cxx", "tests/c_cpp", "cppcheck", rule_violated, expected_sensor, expected_import)
 
@@ -471,7 +473,7 @@ class TestCNESSonarScanner:
         of a pylint analysis to SonarQube.
         """
         rule_violated = "external_pylint:C0326"
-        expected_sensor = "INFO: Sensor Python Sensor [python]"
-        expected_import = "INFO: Sensor Import of Pylint issues [python]"
+        expected_sensor = "INFO  Sensor Python Sensor [python]"
+        expected_import = "INFO  Sensor Import of Pylint issues [python]"
         self.import_analysis_results("Pylint Dummy Project", "pylint-dummy-project",
             "Sonar way", "py", "tests/python", "src", rule_violated, expected_sensor, expected_import)

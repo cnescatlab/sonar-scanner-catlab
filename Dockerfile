@@ -15,10 +15,10 @@ RUN apt update \
     && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 
 # sonar-scanner
-RUN curl -ksSLO https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006.zip \
-    && unzip sonar-scanner-cli-5.0.1.3006.zip \
-    && mv ./sonar-scanner-5.0.1.3006 /sonar-scanner \
-    && rm sonar-scanner-cli-5.0.1.3006.zip
+RUN curl -ksSLO https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-6.0.0.4432.zip \
+    && unzip sonar-scanner-cli-6.0.0.4432.zip \
+    && mv ./sonar-scanner-6.0.0.4432 /sonar-scanner \
+    && rm sonar-scanner-cli-6.0.0.4432.zip
 
 # CppCheck
 RUN curl -ksSLO https://github.com/danmar/cppcheck/archive/refs/tags/2.14.0.tar.gz \
