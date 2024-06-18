@@ -2,8 +2,8 @@
 FROM ubuntu:22.04 AS builder
 
 # Install tools from sources
-RUN apt update \
-    && apt install -y --no-install-recommends \
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
     curl=7.81.0-* \
     # for C/C++ tools
     make=4.3-* \
@@ -21,14 +21,14 @@ RUN curl -ksSLO https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/
     && rm sonar-scanner-cli-6.0.0.4432.zip
 
 # CppCheck
-RUN curl -ksSLO https://github.com/danmar/cppcheck/archive/refs/tags/2.14.0.tar.gz \
-    && tar -zxvf 2.14.0.tar.gz  \
-    && make -C cppcheck-2.14.0/ install \
+RUN curl -ksSLO https://github.com/danmar/cppcheck/archive/refs/tags/2.14.1.tar.gz \
+    && tar -zxvf 2.14.1.tar.gz  \
+    && make -C cppcheck-2.14.1/ install \
     MATCHCOMPILER="yes" \
     FILESDIR="/usr/share/cppcheck" \
     HAVE_RULES="yes" \
     CXXFLAGS="-O2 -DNDEBUG -Wall -Wno-sign-compare -Wno-unused-function -Wno-deprecated-declarations" \
-    && rm -rf cppcheck-2.14.0 2.14.0.tar.gz
+    && rm -rf cppcheck-2.14.1 2.14.1.tar.gz
 
 ################################################################################
 
@@ -83,9 +83,9 @@ COPY --from=builder /usr/bin/cppcheck-htmlreport /usr/bin
 COPY pylintrc.d/ /opt/python/
 
 # Install tools
-RUN apt update \
+RUN apt-get update \
     && mkdir -p /usr/share/man/man1 \
-    && apt install -y --no-install-recommends \
+    && apt-get install -y --no-install-recommends \
     # Needed by sonar-scanner
     openjdk-17-jre=17.0.* \
     # Needed by Pylint
