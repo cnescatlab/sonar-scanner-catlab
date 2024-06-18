@@ -173,15 +173,14 @@ class TestCNESSonarScanner:
 
             :returns: output of the analysis
             """
-            #Print the output of docker ps -a with the container name to help debugging
-            print(docker_client.containers.list(all=True, filters={"name": cls.SONARQUBE_CONTAINER_NAME}))
+
             print(f"Analysing project {project_key}...")
             output = docker_client.containers.run(cls._SONAR_SCANNER_IMAGE,
                 f"-Dsonar.projectBaseDir=/usr/src/tests/{folder} -Dsonar.login={cls.SONARQUBE_TOKEN}",
                 auto_remove=True,
                 environment={"SONAR_HOST_URL": cls.SONARQUBE_URL},
                 network=cls.SONARQUBE_NETWORK,
-                user=f"{os.getuid()}:{os.getgid()}",
+                user="0:0",
                 volumes={
                     f"{cls._PROJECT_ROOT_DIR}": {'bind': '/usr/src', 'mode': 'rw'},
                     f"{cls._PROJECT_ROOT_DIR}/.sonarcache": {'bind': '/opt/sonar-scanner/.sonar/cache', 'mode': 'rw'}
@@ -263,7 +262,7 @@ class TestCNESSonarScanner:
         docker_client = docker.from_env()
         output = docker_client.containers.run(cls._SONAR_SCANNER_IMAGE, cmd,
             auto_remove=True,
-            user=f"{os.getuid()}:{os.getgid()}",
+            user="0:0",
             volumes={f"{cls._PROJECT_ROOT_DIR}": {'bind': '/usr/src', 'mode': 'rw'}}).decode("utf-8")
         if store_output:
             with open(os.path.join(cls._PROJECT_ROOT_DIR, tmp_file), "w", encoding="utf8") as f:
@@ -333,7 +332,7 @@ class TestCNESSonarScanner:
             f"-Dsonar.projectKey={project_key} -Dsonar.projectName=\"{project_name}\" -Dsonar.projectVersion=1.0 -Dsonar.sources={source_folder} \
             -Dsonar.login={cls.SONARQUBE_TOKEN}",
             auto_remove=True,
-            user=f"{os.getuid()}:{os.getgid()}",
+            user="0:0",
             volumes={
                 f"{cls._PROJECT_ROOT_DIR}": {'bind': '/usr/src', 'mode': 'rw'},
                 f"{cls._PROJECT_ROOT_DIR}/.sonarcache": {'bind': '/opt/sonar-scanner/.sonar/cache', 'mode': 'rw'}
