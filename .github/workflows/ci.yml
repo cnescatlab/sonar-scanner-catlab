@@ -67,10 +67,6 @@ jobs:
           echo "Retrieving the sonarqube-catlab image..."
           docker pull lequal/sonarqube-catlab:latest
           echo "Testing the scanner image..."
-          echo -e "Results of the CI pipeline\n" > tests_logs.txt
           cd tests/
-          python3 -m pip install -r requirements.txt
-          python3 -m pytest -v |& tee -a ../tests_logs.txt
-      # Have the job fail if at least one test failed
-      - name: Check all tests passed
-        run: grep -v -q "FAILED" tests_logs.txt
+          pip install -r requirements.txt
+          pytest -v

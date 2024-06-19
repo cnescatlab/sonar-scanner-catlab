@@ -2,8 +2,8 @@
 FROM ubuntu:22.04 AS builder
 
 # Install tools from sources
-RUN apt update \
-    && apt install -y --no-install-recommends \
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
     curl=7.81.0-* \
     # for C/C++ tools
     make=4.3-* \
@@ -15,25 +15,20 @@ RUN apt update \
     && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 
 # sonar-scanner
-RUN curl -ksSLO https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006.zip \
-    && unzip sonar-scanner-cli-5.0.1.3006.zip \
-    && mv ./sonar-scanner-5.0.1.3006 /sonar-scanner \
-    && rm sonar-scanner-cli-5.0.1.3006.zip
+RUN curl -ksSLO https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-6.0.0.4432.zip \
+    && unzip sonar-scanner-cli-6.0.0.4432.zip \
+    && mv ./sonar-scanner-6.0.0.4432 /sonar-scanner \
+    && rm sonar-scanner-cli-6.0.0.4432.zip
 
 # CppCheck
-RUN curl -ksSLO https://github.com/danmar/cppcheck/archive/refs/tags/2.14.0.tar.gz \
-    && tar -zxvf 2.14.0.tar.gz  \
-    && make -C cppcheck-2.14.0/ install \
+RUN curl -ksSLO https://github.com/danmar/cppcheck/archive/refs/tags/2.14.1.tar.gz \
+    && tar -zxvf 2.14.1.tar.gz  \
+    && make -C cppcheck-2.14.1/ install \
     MATCHCOMPILER="yes" \
     FILESDIR="/usr/share/cppcheck" \
     HAVE_RULES="yes" \
     CXXFLAGS="-O2 -DNDEBUG -Wall -Wno-sign-compare -Wno-unused-function -Wno-deprecated-declarations" \
-    && rm -rf cppcheck-2.14.0 2.14.0.tar.gz
-
-# Infer
-RUN curl -ksSLO https://github.com/facebook/infer/releases/download/v1.1.0/infer-linux64-v1.1.0.tar.xz \
-    && tar -C /opt -Jxvf infer-linux64-v1.1.0.tar.xz \
-    && rm infer-linux64-v1.1.0.tar.xz
+    && rm -rf cppcheck-2.14.1 2.14.1.tar.gz
 
 ################################################################################
 
@@ -84,17 +79,13 @@ COPY --from=builder /usr/share/cppcheck /usr/share/cppcheck
 COPY --from=builder /usr/bin/cppcheck /usr/bin
 COPY --from=builder /usr/bin/cppcheck-htmlreport /usr/bin
 
-# Add Infer from builder stage
-COPY --from=builder /opt/infer-linux64-v1.1.0/bin /opt/infer-linux64-v1.1.0/bin
-COPY --from=builder /opt/infer-linux64-v1.1.0/lib /opt/infer-linux64-v1.1.0/lib
-
 # Add CNES pylintrc A_B, C, D
 COPY pylintrc.d/ /opt/python/
 
 # Install tools
-RUN apt update \
+RUN apt-get update \
     && mkdir -p /usr/share/man/man1 \
-    && apt install -y --no-install-recommends \
+    && apt-get install -y --no-install-recommends \
     # Needed by sonar-scanner
     openjdk-17-jre=17.0.* \
     # Needed by Pylint
@@ -102,14 +93,6 @@ RUN apt update \
     python3-pip=22.0.2* \
     # Shellcheck
     shellcheck=0.8.0-* \
-    # Needed by Infer
-    libsqlite3-0=3.37.2-* \
-    python2.7=2.7.18-* \
-    # Compilation tools needed by Infer
-    gcc=4:11.2.0-* \
-    g\+\+=4:11.2.0-* \
-    clang=1:14.0-* \
-    make=4.3-* \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /usr/local/man \
     # Install pylint and CNES pylint extension
@@ -125,9 +108,7 @@ RUN apt update \
     isort==5.13.2 \
     typed-ast==1.5.5 \
     astroid==3.1.0 \
-    pylint==3.1.0 \
-    # Infer
-    && ln -s "/opt/infer-linux64-v1.1.0/bin/infer" /usr/local/bin/infer
+    pylint==3.1.0
 
 # Make sonar-scanner, CNES pylint and C/C++ tools executable
 ENV PATH="$SONAR_SCANNER_HOME/bin:/usr/local/bin:$PATH" \
