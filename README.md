@@ -1,7 +1,6 @@
 # CNES sonar-scanner-catlab image
 
-![](https://github.com/cnescatlab/sonar-scanner/workflows/CI/badge.svg)
-![](https://github.com/cnescatlab/sonar-scanner/workflows/CD/badge.svg)
+![CI badge](https://github.com/cnescatlab/sonar-scanner/workflows/CI/badge.svg) ![CD badge](https://github.com/cnescatlab/sonar-scanner/workflows/CD/badge.svg)
 
 > Docker environment containing open source code analysis tools configured by CNES and dedicated to Continuous Integration.
 
@@ -22,7 +21,7 @@ Additional features are:
 - Embedded tools
   - see the [list](#analysis-tools-included)
 - Configuration files
-  - [pylintrc](#how-to-use-embedded-CNES-pylintrc)
+  - [pylintrc](#how-to-use-embedded-cnes-pylintrc)
 
 _This image is made to be used in conjunction with a pre-configured SonarQube server image that embeds all necessary plugins and configuration: [cnescatlab/sonarqube](https://github.com/cnescatlab/sonarqube-catlab). It is, however, not mandatory to use it._
 
@@ -31,6 +30,7 @@ _This image is made to be used in conjunction with a pre-configured SonarQube se
 1. Write a `sonar-project.properties` at the root of your project
    - For information on what to write in it, see the [official SonarQube documentation](https://docs.sonarqube.org/sonarqube/9.9/)
 2. Execute the sonar-scanner on the project by running this image from the root of the project
+
    ```sh
    $ docker run \
            --rm \
@@ -39,8 +39,10 @@ _This image is made to be used in conjunction with a pre-configured SonarQube se
            -v "$(pwd):/usr/src" \
            lequal/sonar-scanner
    ```
+
    This docker command is equivalent to `sonar-scanner -Dsonar.host.url="url of your SonarQube instance"`.
    - If the SonarQube server is running in a container on the same computer, you will need to connect both containers (server and client) to the same bridge so that they can communicate. To do so:
+
      ```sh
      $ docker network create -d bridge sonarbridge
      $ docker network connect sonarbridge "name of your sonarqube container"
@@ -235,12 +237,12 @@ sonar-scanning:
 
 | Tool                                                                           | Version    | Default report file |
 | ------------------------------------------------------------------------------ | ---------- | ------------------- |
-| [sonar-scanner](https://docs.sonarqube.org/latest/analysis/scan/sonarscanner/) | 5.0.1.3006 |                     |
+| [sonar-scanner](https://docs.sonarqube.org/latest/analysis/scan/sonarscanner/) | 6.0.0.4432 |                     |
 | [ShellCheck](https://github.com/koalaman/shellcheck)                           | 0.8.0      |                     |
 | [pylint](http://pylint.pycqa.org/en/latest/user_guide/index.html)              | 3.1.0      | pylint-report.txt   |
 | [CNES pylint extension](https://github.com/cnescatlab/cnes-pylint-extension)   | 7.0.0      |                     |
-| [CppCheck](https://github.com/danmar/cppcheck)                                 | 2.14.0     | cppcheck-report.xml |
-| [Infer](https://fbinfer.com/)                                                  | 1.1.0      |                     |
+| [CppCheck](https://github.com/danmar/cppcheck)                                 | 2.14.1     | cppcheck-report.xml |
+| [Hadolint](https://hadolint.github.io/hadolint/)                               | 2.12.0     |                     |
 
 ## Developer's guide
 
