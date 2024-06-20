@@ -30,6 +30,11 @@ RUN curl -ksSLO https://github.com/danmar/cppcheck/archive/refs/tags/2.14.1.tar.
     CXXFLAGS="-O2 -DNDEBUG -Wall -Wno-sign-compare -Wno-unused-function -Wno-deprecated-declarations" \
     && rm -rf cppcheck-2.14.1 2.14.1.tar.gz
 
+# Hadolint
+RUN curl -ksSLO https://github.com/hadolint/hadolint/releases/download/v2.12.0/hadolint-Linux-x86_64 \
+    && mv hadolint-Linux-x86_64 /usr/bin/hadolint \
+    && chmod +x /usr/bin/hadolint
+
 ################################################################################
 
 # Final image based on the official sonar-scanner image
@@ -81,6 +86,9 @@ COPY --from=builder /usr/bin/cppcheck-htmlreport /usr/bin
 
 # Add CNES pylintrc A_B, C, D
 COPY pylintrc.d/ /opt/python/
+
+# Add hadolint from builder stage
+COPY --from=builder /usr/bin/hadolint /usr/bin
 
 # Install tools
 RUN apt-get update \
